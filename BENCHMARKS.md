@@ -7,10 +7,10 @@
 | 内容 | 値 |
 |------|-----|
 | 実行コード | 未登録のため **baseline と同一**（上と同指標。将来レジストリで差し替え可） |
-| 生ログ（JSON まとめ） | [docs/benchmarks/composer-2-fast.json](docs/benchmarks/composer-2-fast.json) |
+| 生ログ（JSON まとめ） | [docs/benchmarks/composer-2-fast.json](docs/benchmarks/composer-2-fast.json)（`executed_by` 付きで再計測可） |
 | 計測日 | 2026-04-27 (UTC) |
 
-`runtime_ms` 例（同一会話で取得）: gnss 0.22, lidar 2.58, vision 10.4, planning 0.33, control 0.13（**環境で変動**）。
+`runtime_ms` は**毎回変動**。直近のエージェント実行例: gnss 0.22, lidar 2.70, vision 19.5, planning 0.37, control 0.13 前後（**CPU・負荷依存**）。
 
 ### `opus-4.7`（`--model opus-4.7`）
 

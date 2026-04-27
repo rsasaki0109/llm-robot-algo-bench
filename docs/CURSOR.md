@@ -11,6 +11,10 @@
 
 ※ 未登録の `--model` は **いまは `baseline` 実装にフォールバック**する。生成したコードを **`runner/model_registry.py`** に登録したあと、同じ `--model` で**初めて独自実装が走る**。
 
+## エージェント（Composer 2 Fast 等）に任せる場合
+
+チャット側で **「`bench run` を `--model composer-2-fast` で5タスク全部回して、`docs/benchmarks/composer-2-fast.json` を更新して」** と依頼すれば、ターミナル経由で**同じ手順を代行**できる（中身は未登録時 **baseline 実装**のまま）。再現性のため JSON に `executed_by` を足す運用でもよい。
+
 ## 手順（ざっくり）
 
 1. Cursor で本リポを開く。
