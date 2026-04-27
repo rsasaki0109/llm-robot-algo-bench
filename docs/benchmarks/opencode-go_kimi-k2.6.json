@@ -1,13 +1,13 @@
 {
   "model": "opencode-go_kimi-k2.6",
   "date_utc": "2026-04-27",
-  "executed_by": "scripts/refresh_benchmark_docs.py @ sasaki-desktop",
+  "executed_by": "local sasaki@sasaki-desktop",
   "host_note": "model_registry 未登録の model は baseline 実装（指標は同梱デモ自己整合）",
   "bench_version_hint": "llm-robot-algo-bench: repo data/* snapshot",
   "tasks": {
     "gnss": {
       "input": "data/gnss/sample.nmea",
-      "runtime_ms": 0.388,
+      "runtime_ms": 0.308,
       "metrics": {
         "rmse": 7.287473522531164e-13,
         "speed_error": 4.107048034995842e-13
@@ -35,7 +35,7 @@
     },
     "lidar": {
       "input": "data/lidar/points.npy",
-      "runtime_ms": 16.505,
+      "runtime_ms": 9.483,
       "metrics": {
         "cluster_count_score": 1.0,
         "mean_iou": 1.0,
@@ -65,7 +65,7 @@
     },
     "vision": {
       "input": "data/vision/sample.jpg",
-      "runtime_ms": 347.249,
+      "runtime_ms": 594.541,
       "metrics": {
         "map50_simple": 1.0,
         "precision@0.5": 1.0,
@@ -95,7 +95,7 @@
     },
     "planning": {
       "input": "data/planning/scenario.json",
-      "runtime_ms": 0.656,
+      "runtime_ms": 0.673,
       "metrics": {
         "reaches_goal": 1.0,
         "length_excess": -4.0,
@@ -125,7 +125,7 @@
     },
     "control": {
       "input": "data/control/scenario.json",
-      "runtime_ms": 0.315,
+      "runtime_ms": 0.395,
       "metrics": {
         "rmse": 0.10435720017291239,
         "max_abs": 0.12499542980194989,
