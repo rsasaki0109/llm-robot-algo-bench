@@ -11,6 +11,11 @@
 **比較の主軸**は **正しさ**（`metrics` / `quality_pass`）と、必要なら **実装の複雑度**（`impl.code_metrics`、実ソースの LOC・分岐目安）。**`runtime_ms` は補助**。**出題上の難易度**は `task_spec.difficulty_tier`（タスク種別）で分けている。詳細は [SUMMARY.md](docs/benchmarks/SUMMARY.md) 冒頭。  
 **AtCoder 風に「テストで AC か」をやるイメージ**は [docs/BENCH_JUDGE.md](docs/BENCH_JUDGE.md)（サンプル／ジャッジ／隠しテストの対応表と、多ケース化の次の一歩）。
 
+**SUMMARY の見方（重要）**:
+
+- **AC (`quality_pass`)**: 5 タスク中 **何本「合格」したか**（例 `4/5`）
+- **Impl (`!fallback`)**: 5 タスク中 **何本「フォールバック無し」で動いたか**（例 `1/5`）。ここが低いと「そのモデルの実装ができた」とは言いにくい（baseline が代わりに走っている）。
+
 **何ができる？** ロボ向け **5 タスク**（**GNSS / LiDAR / 画像 / 計画 `planning` / 制御 `control`）のパイプラインに対し、**同じ入力**で **生成アルゴ or baseline** を走らせ、**数値＋JSON** で比較する。**GPU 不要・ローカル CLI**（`bench run`）。
 
 **知覚（センサ・画像）**に加え、**動作計画（グリッド上の経路）**と **制御（1 次系追従）** も**同列のタスク**として入っています（`tasks/`＋`evaluator/`＋`model_registry`）。
