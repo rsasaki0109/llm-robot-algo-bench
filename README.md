@@ -3,7 +3,7 @@
 ![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)
 ![CI smoke](https://github.com/rsasaki0109/llm-robot-algo-bench/actions/workflows/smoke.yml/badge.svg)
 
-**👉 ベンチ結果をさっと見る → [docs/benchmarks/SUMMARY.md](docs/benchmarks/SUMMARY.md)**（`runtime_ms` 一行表・横棒・JSON へリンク）
+**👉 ベンチ結果** → [docs/benchmarks/SUMMARY.md](docs/benchmarks/SUMMARY.md) ／ **OpenCode Go（Kimi / Qwen / DeepSeek）疎通 `wall_ms` だけ先に見る** → [SUMMARY「OpenCode Go smoke results」](docs/benchmarks/SUMMARY.md#opencode-go-smoke-results)（`runtime_ms` 表・横棒・JSON へもリンク）
 
 - **JSON＋SUMMARY を同梱データで作り直す（推奨）**: `python3 scripts/refresh_benchmark_docs.py` → `docs/benchmarks/<model>.json` を上書きし、続けて `gen_benchmark_summary.py` で [SUMMARY.md](docs/benchmarks/SUMMARY.md) を更新。
 - **SUMMARY だけ**既存 JSON から再生成: `python3 scripts/gen_benchmark_summary.py`。

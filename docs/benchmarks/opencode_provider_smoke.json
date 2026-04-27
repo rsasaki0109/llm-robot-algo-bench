@@ -9,24 +9,24 @@
       "model": "opencode-go/kimi-k2.6",
       "exit_code": 0,
       "ok": true,
-      "wall_ms": 8056.3,
-      "stdout_excerpt": "provider smoke test is OK",
+      "wall_ms": 10835.2,
+      "stdout_excerpt": "Provider smoke test is OK.",
       "stderr_excerpt": "> build · kimi-k2.6"
     },
     {
       "model": "opencode-go/qwen3.6-plus",
       "exit_code": 0,
       "ok": true,
-      "wall_ms": 9481.8,
-      "stdout_excerpt": "provider smoke test OK",
+      "wall_ms": 8076.4,
+      "stdout_excerpt": "Provider smoke test is OK.",
       "stderr_excerpt": "> build · qwen3.6-plus"
     },
     {
       "model": "opencode-go/deepseek-v4-pro",
       "exit_code": 0,
       "ok": true,
-      "wall_ms": 5135.6,
-      "stdout_excerpt": "`Provider smoke test passed successfully.`",
+      "wall_ms": 4496.3,
+      "stdout_excerpt": "Provider smoke test OK confirmed.",
       "stderr_excerpt": "> build · deepseek-v4-pro"
     }
   ]

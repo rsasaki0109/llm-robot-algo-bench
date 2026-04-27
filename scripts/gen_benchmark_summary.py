@@ -83,6 +83,47 @@ def _order_opencode_ids(oc: dict[str, float]) -> list[str]:
     return out
 
 
+def _opencode_top_block(path: Path) -> str:
+    """OpenCode 疎通を最上部に出す（GitHub 目次・README 用アンカー: #opencode-go-smoke-results）。"""
+    if not path.is_file():
+        return ""
+    d = json.loads(path.read_text(encoding="utf-8"))
+    if d.get("kind") != "opencode_run_smoke" or not isinstance(d.get("models"), list):
+        return ""
+    rows: list[dict] = [e for e in d["models"] if isinstance(e, dict) and e.get("model")]
+    if not rows:
+        return ""
+    by_id: dict[str, dict] = {str(e["model"]): e for e in rows}
+    ocd: dict[str, float] = {}
+    for k, e in by_id.items():
+        w = e.get("wall_ms")
+        if w is not None:
+            try:
+                ocd[k] = float(w)
+            except (TypeError, ValueError):
+                ocd[k] = 0.0
+    order_ids = _order_opencode_ids(ocd)
+    date_utc = d.get("date_utc", "—")
+    ex = d.get("executed_by", "")
+    lines: list[str] = [
+        "## OpenCode Go smoke results\n",
+        f"1 回 `opencode run` あたりの **wall_ms**（**bench の 5 タスク得点ではない**）。"
+        f" 日付 **{date_utc} (UTC)** ・[生 JSON]({OPENCODE_SMOKE_PATH})。\n",
+    ]
+    if ex:
+        lines.append(f"`executed_by`: {ex}\n")
+    lines.append("| model | wall_ms | ok |\n|-------|---------|----|")
+    for mid in order_ids:
+        e = by_id.get(mid, {})
+        w = e.get("wall_ms")
+        okb = e.get("ok", False) is True
+        wh = _fmt_ms(w) if w is not None else "—"
+        mark = "OK" if okb else "NG"
+        lines.append(f"| `{mid}` | **{wh}** ms | {mark} |")
+    lines.append("")
+    return "\n".join(lines)
+
+
 def main() -> None:
     files: dict[str, dict] = {}
     for p in sorted(BDIR.glob("*.json")):
@@ -109,6 +150,9 @@ def main() -> None:
 
     lines: list[str] = []
     lines.append("# ベンチ結果（一覧）\n")
+    oc_top = _opencode_top_block(BDIR / OPENCODE_SMOKE_PATH)
+    if oc_top:
+        lines.append(oc_top)
     lines.append(
         "同梱 `data/*` の **`bench run` → `runtime_ms` の一覧**（**品質**は各 JSON の `metrics` 参照。未登録 `model` は **baseline 実装**のため**数値は同系**）。\n"
     )
