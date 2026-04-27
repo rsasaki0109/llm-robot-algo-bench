@@ -1,0 +1,55 @@
+{
+  "model": "composer-2-fast",
+  "date_utc": "2026-04-27",
+  "host_note": "ローカル1回。model_registry 未登録のため baseline 実装が実行され、指標は baseline 自己整合デモと同じ。",
+  "bench_version_hint": "llm-robot-algo-bench リポ同梱 data/",
+  "tasks": {
+    "gnss": {
+      "input": "data/gnss/sample.nmea",
+      "runtime_ms": 0.22,
+      "metrics": {
+        "rmse": 7.287473522531164e-13,
+        "speed_error": 4.107048034995842e-13
+      }
+    },
+    "lidar": {
+      "input": "data/lidar/points.npy",
+      "runtime_ms": 2.576,
+      "metrics": {
+        "cluster_count_score": 1.0,
+        "mean_iou": 1.0,
+        "n_pred_clusters": 3.0,
+        "n_true_clusters": 3.0
+      }
+    },
+    "vision": {
+      "input": "data/vision/sample.jpg",
+      "runtime_ms": 10.449,
+      "metrics": {
+        "map50_simple": 1.0,
+        "precision@0.5": 1.0,
+        "recall@0.5": 1.0,
+        "mean_iou_matched": 0.9843730773962929
+      }
+    },
+    "planning": {
+      "input": "data/planning/scenario.json",
+      "runtime_ms": 0.334,
+      "metrics": {
+        "reaches_goal": 1.0,
+        "length_excess": 0.0,
+        "collision_free": 1.0,
+        "waypoint_mae": 0.0
+      }
+    },
+    "control": {
+      "input": "data/control/scenario.json",
+      "runtime_ms": 0.134,
+      "metrics": {
+        "rmse": 0.0,
+        "max_abs": 0.0,
+        "mean_abs": 0.0
+      }
+    }
+  }
+}

@@ -2,7 +2,19 @@
 
 **各モデル・各 LLM の比較表は [README 冒頭付近](README.md) の「各モデル（LLM）別ベンチマーク結果」セクションを主に更新するのが推奨**（来訪者が一発で比較できる）。本ファイルは、同梱デモ条件の**詳細**と**再現手順**のメモ用です。
 
-**条件**: リポ内の `data/<task>/` サンプル＋`--model baseline`。**GNSS** は正解を同じ NMEA から整合させているため、**RMSE は数値誤差レベル**になる（baseline の自己一致チェック用途）。**実行日**: 2026-04-27（手元ローカル1回、実行時間は目安）。
+### `composer-2-fast`（`--model composer-2-fast`）
+
+| 内容 | 値 |
+|------|-----|
+| 実行コード | 未登録のため **baseline と同一**（上と同指標。将来レジストリで差し替え可） |
+| 生ログ（JSON まとめ） | [docs/benchmarks/composer-2-fast.json](docs/benchmarks/composer-2-fast.json) |
+| 計測日 | 2026-04-27 (UTC) |
+
+`runtime_ms` 例（同一会話で取得）: gnss 0.22, lidar 2.58, vision 10.4, planning 0.33, control 0.13（**環境で変動**）。
+
+---
+
+**条件**: リポ内の `data/<task>/` サンプル＋`--model baseline`（上の baseline 行）。**GNSS** は正解を同じ NMEA から整合させているため、**RMSE は数値誤差レベル**になる（baseline の自己一致チェック用途）。**実行日**: 2026-04-27（手元ローカル1回、実行時間は目安）。
 
 ## 指標
 
