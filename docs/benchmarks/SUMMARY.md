@@ -19,52 +19,22 @@
 | `control` | 2 | ode/tracking | 1 次系＋目標追従。制御則＋積分。 |
 
 
-> **疎通＝採点ではない**: 下の **OpenCode Go** ブロックは **`opencode run` 1 回**の接続・応答（`wall_ms`）の記録。 **GNSS / LiDAR / … の `metrics` や本ベンチの比較ではない**。 そのモデルで本当に測る手順: [../OPENCODE_BENCH.md](../OPENCODE_BENCH.md)（生成コード → `model_registry` → `bench run`）。
-
-
-## OpenCode Go smoke results
-
-1 回 `opencode run` あたりの **wall_ms**（**bench の 5 タスク得点ではない**）。 日付 **2026-04-27 (UTC)** ・[生 JSON](opencode_provider_smoke.json)。
-
-`executed_by`: scripts/refresh_opencode_provider_smoke.py @ sasaki-desktop
-
-| model | wall_ms | ok |
-|-------|---------|----|
-| `opencode-go/kimi-k2.6` | **4698** ms | OK |
-| `opencode-go/qwen3.6-plus` | **7570** ms | OK |
-| `opencode-go/deepseek-v4-pro` | **6180** ms | OK |
-
 同梱 `data/*` で `bench run` した**クイック表**。 **正しさ・合格**は各 `docs/benchmarks/<model>.json` の `metrics` / `quality_pass`、**コードの重さ**は `impl.code_metrics` を見る。 未登録 `model` は **baseline 実装**にフォールバック（`impl.used_fallback`）。
 
-**OpenCode Go** 行（`opencode-go/...`）は 5 タスク未実施（`—`）。 最右列 *疎通* は [docs/benchmarks/opencode_provider_smoke.json](opencode_provider_smoke.json) の `opencode run` **1 回**の `wall_ms`（**Go 枠**のモデルID・API/ネット依存）。 更新: `OPENCODE_MODELS=opencode-go/...` で `python3 scripts/refresh_opencode_provider_smoke.py` → 本 SUMMARY 再生成。
-
-| モデル | gnss (ms) | lidar (ms) | vision (ms) | planning (ms) | control (ms) | 5 タスク計 / *疎通* (ms) |
+| モデル | gnss (ms) | lidar (ms) | vision (ms) | planning (ms) | control (ms) | 5 タスク計 (ms) |
 |--------|-----------|------------|-------------|---------------|--------------|------------|
 | `baseline` | 0.22 | 2.8 | 12 | 0.30 | 0.10 | **~16** |
 | `composer-2-fast` | 0.17 | 2.2 | 2.7 | 0.30 | 0.07 | **~5.5** |
 | `opus-4.7` | 0.11 | 1.5 | 2.0 | 0.27 | 0.08 | **~3.9** |
-| `opencode-go/kimi-k2.6` | — | — | — | — | — | *疎通 ~4698* |
-| `opencode-go/qwen3.6-plus` | — | — | — | — | — | *疎通 ~7570* |
-| `opencode-go/deepseek-v4-pro` | — | — | — | — | — | *疎通 ~6180* |
 
 ## `runtime_ms` 横棒（5 タスク合計、相対）
 
-最長行をフル幅（`█`）に合わせた**相対比**（**絶対速度の主張ではない**）。 合計は 5 タスク `runtime_ms` の和。**OpenCode Go 行はここに含まない**（疎通は下の専用図）。
+最長行をフル幅（`█`）に合わせた**相対比**（**絶対速度の主張ではない**）。 合計は 5 タスク `runtime_ms` の和。
 
 ```
 `baseline`         ██████████████████████  16 ms
 `composer-2-fast`  ████████··············  5.5 ms
 `opus-4.7`         ██████················  3.9 ms
-```
-
-## OpenCode Go 疎通 `wall_ms` 横棒（1 回 `opencode run`、相対）
-
-5 タスク `bench` とは**別物**（`opencode-go/...`）。最長 `wall_ms` をフル幅（`█`）に合わせた**相対比**。
-
-```
-`opencode-go/kimi-k2.6`        ██████████████········  4698 ms
-`opencode-go/qwen3.6-plus`     ██████████████████████  7570 ms
-`opencode-go/deepseek-v4-pro`  ██████████████████····  6180 ms
 ```
 
 ## タスク別 `runtime_ms` 横棒
@@ -120,4 +90,3 @@
 - [`baseline`](baseline.json)
 - [`composer-2-fast`](composer-2-fast.json)
 - [`opus-4.7`](opus-4.7.json)
-- [OpenCode **Go** 疎通（`opencode run` ・上表の `opencode-go/...` 行）](opencode_provider_smoke.json)
