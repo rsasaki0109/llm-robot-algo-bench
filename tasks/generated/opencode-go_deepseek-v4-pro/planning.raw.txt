@@ -1,0 +1,1 @@
+Wrote `tasks/planning/planning.py` — a self-contained reimplementation using 8-directional A* with octile heuristic and proper `√2` diagonal step costs, while preserving the exact same `run_planning` API and noise injection logic.

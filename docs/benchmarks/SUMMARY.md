@@ -23,10 +23,10 @@
 
 | モデル | AC (`quality_pass`) | AC（タスク別） | Impl（非フォールバック） | gnss (ms) | lidar (ms) | vision (ms) | planning (ms) | control (ms) | 5 タスク計 (ms) |
 |--------|--------------------|------------|-------------------------|-----------|------------|-------------|---------------|--------------|------------|
-| `baseline` | **5/5** | G✓ L✓ V✓ P✓ C✓ | 5/5 | 0.23 | 2.5 | 6.2 | 0.30 | 0.09 | **~9.3** |
-| `opencode-go_kimi-k2.6` | **5/5** | G✓ L✓ V✓ P✓ C✓ | 5/5 | 0.41 | 20 | 552 | 0.59 | 0.31 | **~574** |
-| `opencode-go_qwen3.6-plus` | **4/5** | G✗ L✓ V✓ P✓ C✓ | 1/5 | 0.51 | 1.5 | 1.5 | 0.34 | 0.14 | **~4.0** |
-| `opencode-go_deepseek-v4-pro` | **5/5** | G✓ L✓ V✓ P✓ C✓ | 0/5 | 0.13 | 1.5 | 1.2 | 0.19 | 0.09 | **~3.1** |
+| `baseline` | **5/5** | G✓ L✓ V✓ P✓ C✓ | 5/5 | 0.22 | 2.6 | 13 | 0.27 | 0.14 | **~16** |
+| `opencode-go_kimi-k2.6` | **5/5** | G✓ L✓ V✓ P✓ C✓ | 5/5 | 0.39 | 17 | 347 | 0.66 | 0.32 | **~365** |
+| `opencode-go_qwen3.6-plus` | **4/5** | G✗ L✓ V✓ P✓ C✓ | 1/5 | 0.56 | 2.0 | 1.8 | 0.34 | 0.13 | **~4.9** |
+| `opencode-go_deepseek-v4-pro` | **5/5** | G✓ L✓ V✓ P✓ C✓ | 5/5 | 3.6 | 2.8 | 440 | 3.3 | 1.5 | **~451** |
 | `composer-2-fast` | **4/5** | G✗ L✓ V✓ P✓ C✓ | 0/5 | 0.85 | 2.2 | 572 | 0.30 | 0.14 | **~575** |
 | `opus-4.7` | **4/5** | G✗ L✓ V✓ P✓ C✓ | 0/5 | 0.87 | 2.1 | 575 | 0.32 | 0.12 | **~578** |
 
@@ -35,10 +35,10 @@
 最長行をフル幅（`█`）に合わせた**相対比**（**絶対速度の主張ではない**）。 合計は 5 タスク `runtime_ms` の和。
 
 ```
-`baseline`                     ······················  9.3 ms
-`opencode-go_kimi-k2.6`        ██████████████████████  574 ms
-`opencode-go_qwen3.6-plus`     ······················  4.0 ms
-`opencode-go_deepseek-v4-pro`  ······················  3.1 ms
+`baseline`                     █·····················  16 ms
+`opencode-go_kimi-k2.6`        ██████████████········  365 ms
+`opencode-go_qwen3.6-plus`     ······················  4.9 ms
+`opencode-go_deepseek-v4-pro`  █████████████████·····  451 ms
 `composer-2-fast`              ██████████████████████  575 ms
 `opus-4.7`                     ██████████████████████  578 ms
 ```
@@ -50,32 +50,32 @@
 ### gnss
 
 ```
-`baseline`                     ██████················  0.23 ms
-`opencode-go_kimi-k2.6`        ██████████············  0.41 ms
-`opencode-go_qwen3.6-plus`     █████████████·········  0.51 ms
-`opencode-go_deepseek-v4-pro`  ███···················  0.13 ms
-`composer-2-fast`              █████████████████████·  0.85 ms
-`opus-4.7`                     ██████████████████████  0.87 ms
+`baseline`                     █·····················  0.22 ms
+`opencode-go_kimi-k2.6`        ██····················  0.39 ms
+`opencode-go_qwen3.6-plus`     ███···················  0.56 ms
+`opencode-go_deepseek-v4-pro`  ██████████████████████  3.6 ms
+`composer-2-fast`              █████·················  0.85 ms
+`opus-4.7`                     █████·················  0.87 ms
 ```
 
 ### lidar
 
 ```
-`baseline`                     ███···················  2.5 ms
-`opencode-go_kimi-k2.6`        ██████████████████████  20 ms
-`opencode-go_qwen3.6-plus`     ██····················  1.5 ms
-`opencode-go_deepseek-v4-pro`  ██····················  1.5 ms
-`composer-2-fast`              ██····················  2.2 ms
-`opus-4.7`                     ██····················  2.1 ms
+`baseline`                     ███···················  2.6 ms
+`opencode-go_kimi-k2.6`        ██████████████████████  17 ms
+`opencode-go_qwen3.6-plus`     ███···················  2.0 ms
+`opencode-go_deepseek-v4-pro`  ████··················  2.8 ms
+`composer-2-fast`              ███···················  2.2 ms
+`opus-4.7`                     ███···················  2.1 ms
 ```
 
 ### vision
 
 ```
-`baseline`                     ······················  6.2 ms
-`opencode-go_kimi-k2.6`        █████████████████████·  552 ms
-`opencode-go_qwen3.6-plus`     ······················  1.5 ms
-`opencode-go_deepseek-v4-pro`  ······················  1.2 ms
+`baseline`                     ······················  13 ms
+`opencode-go_kimi-k2.6`        █████████████·········  347 ms
+`opencode-go_qwen3.6-plus`     ······················  1.8 ms
+`opencode-go_deepseek-v4-pro`  █████████████████·····  440 ms
 `composer-2-fast`              ██████████████████████  572 ms
 `opus-4.7`                     ██████████████████████  575 ms
 ```
@@ -83,23 +83,23 @@
 ### planning
 
 ```
-`baseline`                     ███████████···········  0.30 ms
-`opencode-go_kimi-k2.6`        ██████████████████████  0.59 ms
-`opencode-go_qwen3.6-plus`     █████████████·········  0.34 ms
-`opencode-go_deepseek-v4-pro`  ███████···············  0.19 ms
-`composer-2-fast`              ███████████···········  0.30 ms
-`opus-4.7`                     ████████████··········  0.32 ms
+`baseline`                     ██····················  0.27 ms
+`opencode-go_kimi-k2.6`        ████··················  0.66 ms
+`opencode-go_qwen3.6-plus`     ██····················  0.34 ms
+`opencode-go_deepseek-v4-pro`  ██████████████████████  3.3 ms
+`composer-2-fast`              ██····················  0.30 ms
+`opus-4.7`                     ██····················  0.32 ms
 ```
 
 ### control
 
 ```
-`baseline`                     ███████···············  0.09 ms
-`opencode-go_kimi-k2.6`        ██████████████████████  0.31 ms
-`opencode-go_qwen3.6-plus`     ██████████············  0.14 ms
-`opencode-go_deepseek-v4-pro`  ██████················  0.09 ms
-`composer-2-fast`              ██████████············  0.14 ms
-`opus-4.7`                     █████████·············  0.12 ms
+`baseline`                     ██····················  0.14 ms
+`opencode-go_kimi-k2.6`        █████·················  0.32 ms
+`opencode-go_qwen3.6-plus`     ██····················  0.13 ms
+`opencode-go_deepseek-v4-pro`  ██████████████████████  1.5 ms
+`composer-2-fast`              ██····················  0.14 ms
+`opus-4.7`                     ██····················  0.12 ms
 ```
 
 ## 品質・合格（`quality_pass` と `metrics`）

@@ -7,7 +7,7 @@
   "tasks": {
     "gnss": {
       "input": "data/gnss/sample.nmea",
-      "runtime_ms": 0.133,
+      "runtime_ms": 3.566,
       "metrics": {
         "rmse": 7.287473522531164e-13,
         "speed_error": 4.107048034995842e-13
@@ -20,22 +20,22 @@
         "task": "gnss"
       },
       "impl": {
-        "source_file": "tasks/gnss/baseline.py",
+        "source_file": "runner/model_registry.py",
         "code_metrics": {
-          "file": "tasks/gnss/baseline.py",
-          "loc": 89,
+          "file": "runner/model_registry.py",
+          "loc": 122,
           "parse_ok": true,
-          "n_functions": 4,
+          "n_functions": 8,
           "n_async_functions": 0,
-          "approx_decision_nodes": 8
+          "approx_decision_nodes": 19
         },
-        "registry_hit": false,
-        "used_fallback": true
+        "registry_hit": true,
+        "used_fallback": false
       }
     },
     "lidar": {
       "input": "data/lidar/points.npy",
-      "runtime_ms": 1.505,
+      "runtime_ms": 2.774,
       "metrics": {
         "cluster_count_score": 1.0,
         "mean_iou": 1.0,
@@ -50,27 +50,27 @@
         "task": "lidar"
       },
       "impl": {
-        "source_file": "tasks/lidar/baseline.py",
+        "source_file": "runner/model_registry.py",
         "code_metrics": {
-          "file": "tasks/lidar/baseline.py",
-          "loc": 27,
+          "file": "runner/model_registry.py",
+          "loc": 122,
           "parse_ok": true,
-          "n_functions": 1,
+          "n_functions": 8,
           "n_async_functions": 0,
-          "approx_decision_nodes": 1
+          "approx_decision_nodes": 19
         },
-        "registry_hit": false,
-        "used_fallback": true
+        "registry_hit": true,
+        "used_fallback": false
       }
     },
     "vision": {
       "input": "data/vision/sample.jpg",
-      "runtime_ms": 1.159,
+      "runtime_ms": 440.147,
       "metrics": {
         "map50_simple": 1.0,
         "precision@0.5": 1.0,
         "recall@0.5": 1.0,
-        "mean_iou_matched": 0.9843730773962929
+        "mean_iou_matched": 0.8741258741258423
       },
       "quality_pass": true,
       "task_spec": {
@@ -80,27 +80,27 @@
         "task": "vision"
       },
       "impl": {
-        "source_file": "tasks/vision/baseline.py",
+        "source_file": "runner/model_registry.py",
         "code_metrics": {
-          "file": "tasks/vision/baseline.py",
-          "loc": 67,
+          "file": "runner/model_registry.py",
+          "loc": 122,
           "parse_ok": true,
-          "n_functions": 2,
+          "n_functions": 8,
           "n_async_functions": 0,
-          "approx_decision_nodes": 7
+          "approx_decision_nodes": 19
         },
-        "registry_hit": false,
-        "used_fallback": true
+        "registry_hit": true,
+        "used_fallback": false
       }
     },
     "planning": {
       "input": "data/planning/scenario.json",
-      "runtime_ms": 0.194,
+      "runtime_ms": 3.252,
       "metrics": {
         "reaches_goal": 1.0,
-        "length_excess": 0.0,
+        "length_excess": -12.0,
         "collision_free": 1.0,
-        "waypoint_mae": 0.0
+        "waypoint_mae": 0.6666666666666666
       },
       "quality_pass": true,
       "task_spec": {
@@ -110,22 +110,22 @@
         "task": "planning"
       },
       "impl": {
-        "source_file": "tasks/planning/baseline.py",
+        "source_file": "runner/model_registry.py",
         "code_metrics": {
-          "file": "tasks/planning/baseline.py",
-          "loc": 79,
+          "file": "runner/model_registry.py",
+          "loc": 122,
           "parse_ok": true,
-          "n_functions": 4,
+          "n_functions": 8,
           "n_async_functions": 0,
-          "approx_decision_nodes": 14
+          "approx_decision_nodes": 19
         },
-        "registry_hit": false,
-        "used_fallback": true
+        "registry_hit": true,
+        "used_fallback": false
       }
     },
     "control": {
       "input": "data/control/scenario.json",
-      "runtime_ms": 0.086,
+      "runtime_ms": 1.508,
       "metrics": {
         "rmse": 0.0,
         "max_abs": 0.0,
@@ -139,17 +139,17 @@
         "task": "control"
       },
       "impl": {
-        "source_file": "tasks/control/baseline.py",
+        "source_file": "runner/model_registry.py",
         "code_metrics": {
-          "file": "tasks/control/baseline.py",
-          "loc": 32,
+          "file": "runner/model_registry.py",
+          "loc": 122,
           "parse_ok": true,
-          "n_functions": 1,
+          "n_functions": 8,
           "n_async_functions": 0,
-          "approx_decision_nodes": 2
+          "approx_decision_nodes": 19
         },
-        "registry_hit": false,
-        "used_fallback": true
+        "registry_hit": true,
+        "used_fallback": false
       }
     }
   }

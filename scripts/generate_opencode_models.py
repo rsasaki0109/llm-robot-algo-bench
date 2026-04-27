@@ -40,6 +40,22 @@ def _coerce_timeout() -> int:
     return t
 
 
+def _timeout_for_task(task: str) -> int:
+    """
+    長いタスクだけ別タイムアウトを許可。
+      OPENCODE_RUN_TIMEOUT_VISION / _PLANNING / _LIDAR / _GNSS / _CONTROL
+    """
+    key = f"OPENCODE_RUN_TIMEOUT_{task.upper()}"
+    raw = os.environ.get(key)
+    if raw is None:
+        return _coerce_timeout()
+    try:
+        t = int(raw)
+    except ValueError:
+        t = _coerce_timeout()
+    return max(60, min(t, 3600))
+
+
 def _bench_slug(opencode_model: str) -> str:
     # `bench --model` にそのまま使うので / を _ に潰す
     s = opencode_model.strip()
@@ -135,6 +151,20 @@ def _prompt_for(task: str, baseline_path: str) -> str:
     raise ValueError(task)
 
 
+def _coerce_module_text(stdout: str) -> str:
+    """
+    OpenCode が solution.py 等に書いた場合も拾い、それ以外は stdout から抽出。
+    """
+    m = re.search(r"Solution written to `([^`]+)`", stdout)
+    if m:
+        written = (ROOT / m.group(1)).resolve()
+        try:
+            return written.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            pass
+    return _extract_python(stdout)
+
+
 def main() -> int:
     opencode_model = os.environ.get("OPENCODE_MODEL", "").strip()
     if not opencode_model:
@@ -143,7 +173,7 @@ def main() -> int:
     if not shutil.which("opencode"):
         print("opencode が PATH にありません", file=sys.stderr)
         return 2
-    timeout_s = _coerce_timeout()
+    retries = int(os.environ.get("OPENCODE_RUN_RETRIES", "2"))
     bench_model = _bench_slug(opencode_model)
     out_dir = GEN / bench_model
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -158,40 +188,40 @@ def main() -> int:
             print(f"skip (exists): {bench_model} / {task}", file=sys.stderr)
             continue
         prompt = _prompt_for(task, baseline_rel)
-        print(f"generate: {bench_model} / {task}", file=sys.stderr)
-        try:
-            p = subprocess.run(
-                ["opencode", "run", "-m", opencode_model, "-f", str(baseline), "--", prompt],
-                capture_output=True,
-                text=True,
-                timeout=timeout_s,
-                cwd=ROOT,
-                stdin=subprocess.DEVNULL,
-            )
-        except subprocess.TimeoutExpired:
-            print(f"timeout: {task}", file=sys.stderr)
-            return 1
-        if p.returncode != 0:
-            print(p.stderr, file=sys.stderr)
-            return p.returncode
-        out_text = p.stdout or ""
-        m = re.search(r"Solution written to `([^`]+)`", out_text)
-        if m:
-            written = (ROOT / m.group(1)).resolve()
+        timeout_s = _timeout_for_task(task)
+        last_err: str | None = None
+        last_out: str = ""
+        for attempt in range(retries + 1):
             try:
-                mod = written.read_text(encoding="utf-8", errors="replace")
-            except OSError:
-                mod = _extract_python(out_text)
-        else:
-            mod = _extract_python(out_text)
-        try:
-            ast.parse(mod, filename=str(out_path))
-        except SyntaxError:
+                print(
+                    f"generate: {bench_model} / {task} (attempt {attempt+1}/{retries+1}, timeout {timeout_s}s)",
+                    file=sys.stderr,
+                )
+                p = subprocess.run(
+                    ["opencode", "run", "-m", opencode_model, "-f", str(baseline), "--", prompt],
+                    capture_output=True,
+                    text=True,
+                    timeout=timeout_s,
+                    cwd=ROOT,
+                    stdin=subprocess.DEVNULL,
+                )
+                if p.returncode != 0:
+                    raise RuntimeError((p.stderr or "").strip() or f"opencode run failed ({p.returncode})")
+                last_out = p.stdout or ""
+                mod = _coerce_module_text(last_out)
+                ast.parse(mod, filename=str(out_path))
+                out_path.write_text(mod, encoding="utf-8")
+                last_err = None
+                break
+            except subprocess.TimeoutExpired:
+                last_err = "timeout"
+            except Exception as e:
+                last_err = str(e)
             dbg = out_path.with_suffix(".raw.txt")
-            dbg.write_text(out_text, encoding="utf-8")
-            print(f"invalid python output: {task} (saved {dbg})", file=sys.stderr)
+            dbg.write_text(last_out, encoding="utf-8")
+        if last_err is not None:
+            print(f"failed: {bench_model} / {task}: {last_err} (saved {out_path.with_suffix('.raw.txt')})", file=sys.stderr)
             return 1
-        out_path.write_text(mod, encoding="utf-8")
     print(bench_model)
     return 0
 

@@ -7,7 +7,7 @@
   "tasks": {
     "gnss": {
       "input": "data/gnss/sample.nmea",
-      "runtime_ms": 0.415,
+      "runtime_ms": 0.388,
       "metrics": {
         "rmse": 7.287473522531164e-13,
         "speed_error": 4.107048034995842e-13
@@ -35,7 +35,7 @@
     },
     "lidar": {
       "input": "data/lidar/points.npy",
-      "runtime_ms": 20.107,
+      "runtime_ms": 16.505,
       "metrics": {
         "cluster_count_score": 1.0,
         "mean_iou": 1.0,
@@ -65,7 +65,7 @@
     },
     "vision": {
       "input": "data/vision/sample.jpg",
-      "runtime_ms": 552.382,
+      "runtime_ms": 347.249,
       "metrics": {
         "map50_simple": 1.0,
         "precision@0.5": 1.0,
@@ -95,7 +95,7 @@
     },
     "planning": {
       "input": "data/planning/scenario.json",
-      "runtime_ms": 0.595,
+      "runtime_ms": 0.656,
       "metrics": {
         "reaches_goal": 1.0,
         "length_excess": -4.0,
@@ -125,7 +125,7 @@
     },
     "control": {
       "input": "data/control/scenario.json",
-      "runtime_ms": 0.312,
+      "runtime_ms": 0.315,
       "metrics": {
         "rmse": 0.10435720017291239,
         "max_abs": 0.12499542980194989,
