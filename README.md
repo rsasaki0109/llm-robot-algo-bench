@@ -85,6 +85,8 @@ bench compare --dir <results_dir>
 - LiDAR: `data/lidar/points.npy`, `data/lidar/ground_truth.json`
 - Vision: `data/vision/sample.jpg`, `data/vision/ground_truth.json`
 
+**baseline の参考スコア・実行時間**は [BENCHMARKS.md](BENCHMARKS.md) を参照（同梱デモ用の目安。実データでは下がる）。
+
 ## 付録: 正解再生成（GNSS）
 
 NMEA 本文を変えたら、`data/gnss/ground_truth.json` を baseline と同じ手順の値に揃えてください。開発者向けに、パーサ＋`lla2enu` から一発で書き出すスニペットをリポジトリ内ドキュメントに残すのが安全です（現リポはサンプル用に揃え済み）。
