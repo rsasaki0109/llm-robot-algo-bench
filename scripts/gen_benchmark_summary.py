@@ -45,6 +45,30 @@ def _fmt_ms(x: object) -> str:
         return f"{v:.1f}"
     return f"{v:.0f}"
 
+
+def _ac_summary(tasks: dict) -> tuple[str, str]:
+    """
+    returns:
+      - ac: 例 "4/5"
+      - impl: 例 "3/5"（フォールバック無し=自前実装が動いたタスク数）
+    """
+    total = 0
+    ac = 0
+    impl = 0
+    for k in ("gnss", "lidar", "vision", "planning", "control"):
+        t = tasks.get(k, {})
+        if not isinstance(t, dict):
+            continue
+        total += 1
+        if t.get("quality_pass") is True:
+            ac += 1
+        im = t.get("impl", {})
+        if isinstance(im, dict) and im.get("used_fallback") is False:
+            impl += 1
+    if total <= 0:
+        return ("—", "—")
+    return (f"{ac}/{total}", f"{impl}/{total}")
+
 def _priority_section() -> str:
     return """## 評価の優先順位（このリポ）
 
@@ -98,11 +122,12 @@ def main() -> None:
         " **正しさ・合格**は各 `docs/benchmarks/<model>.json` の `metrics` / `quality_pass`、**コードの重さ**は `impl.code_metrics` を見る。"
         " 未登録 `model` は **baseline 実装**にフォールバック（`impl.used_fallback`）。\n"
     )
-    lines.append("| モデル | gnss (ms) | lidar (ms) | vision (ms) | planning (ms) | control (ms) | 5 タスク計 (ms) |")
-    lines.append("|--------|-----------|------------|-------------|---------------|--------------|------------|")
+    lines.append("| モデル | AC (`quality_pass`) | Impl (`!fallback`) | gnss (ms) | lidar (ms) | vision (ms) | planning (ms) | control (ms) | 5 タスク計 (ms) |")
+    lines.append("|--------|--------------------|-------------------|-----------|------------|-------------|---------------|--------------|------------|")
     for m in order:
         if m in files:
             t = files[m].get("tasks", {})
+            ac_s, impl_s = _ac_summary(t if isinstance(t, dict) else {})
             acc = 0.0
             rts = []
             for k in ("gnss", "lidar", "vision", "planning", "control"):
@@ -111,7 +136,7 @@ def main() -> None:
                     acc += float(ms)
                 rts.append(_fmt_ms(ms) if ms is not None else "—")
             lines.append(
-                f"| `{m}` | {rts[0]} | {rts[1]} | {rts[2]} | {rts[3]} | {rts[4]} | **~{_fmt_ms(acc)}** |"
+                f"| `{m}` | **{ac_s}** | {impl_s} | {rts[0]} | {rts[1]} | {rts[2]} | {rts[3]} | {rts[4]} | **~{_fmt_ms(acc)}** |"
             )
         else:
             continue
