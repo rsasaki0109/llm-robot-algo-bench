@@ -3,6 +3,8 @@
 ![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)
 ![CI smoke](https://github.com/rsasaki0109/llm-robot-algo-bench/actions/workflows/smoke.yml/badge.svg)
 
+**👉 ベンチ結果をさっと見る → [docs/benchmarks/SUMMARY.md](docs/benchmarks/SUMMARY.md)**（`runtime_ms` 一行表・JSON へリンク。再生成: `python3 scripts/gen_benchmark_summary.py`）
+
 **何ができる？** ロボ向け **5 タスク**（**GNSS / LiDAR / 画像 / 計画 `planning` / 制御 `control`）のパイプラインに対し、**同じ入力**で **生成アルゴ or baseline** を走らせ、**数値＋JSON** で比較する。**GPU 不要・ローカル CLI**（`bench run`）。
 
 **知覚（センサ・画像）**に加え、**動作計画（グリッド上の経路）**と **制御（1 次系追従）** も**同列のタスク**として入っています（`tasks/`＋`evaluator/`＋`model_registry`）。

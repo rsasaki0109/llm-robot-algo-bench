@@ -1,6 +1,8 @@
 # ベンチマーク参考（数値の詳細）
 
-**各モデル・各 LLM の比較表は [README 冒頭付近](README.md) の「各モデル（LLM）別ベンチマーク結果」セクションを主に更新するのが推奨**（来訪者が一発で比較できる）。本ファイルは、同梱デモ条件の**詳細**と**再現手順**のメモ用です。
+**まずは1枚: [docs/benchmarks/SUMMARY.md](docs/benchmarks/SUMMARY.md)**（`runtime` 比較のクイック表。更新は `python3 scripts/gen_benchmark_summary.py`）
+
+各モデル比較の**長い表**は [README 冒頭付近](README.md) も可。本ファイルは、同梱デモ条件の**詳細**と**再現手順**のメモ用です。
 
 ### `composer-2-fast`（`--model composer-2-fast`）
 
