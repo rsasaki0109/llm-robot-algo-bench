@@ -12,6 +12,16 @@
 
 `runtime_ms` 例（同一会話で取得）: gnss 0.22, lidar 2.58, vision 10.4, planning 0.33, control 0.13（**環境で変動**）。
 
+### `opus-4.7`（`--model opus-4.7`）
+
+| 内容 | 値 |
+|------|-----|
+| 実行コード | 未登録のため **baseline と同一**（指標は同梱自己整合。将来差し替え可） |
+| 生ログ（JSON まとめ） | [docs/benchmarks/opus-4.7.json](docs/benchmarks/opus-4.7.json) |
+| 計測日 | 2026-04-27 (UTC) |
+
+`runtime_ms` 例: gnss 0.26, lidar 2.42, vision 14.4, planning 0.33, control 0.12（**環境で変動**）。**algo の差**は出ない（baseline 同一実装のため）が、**`--model` 名付きの検証**として同じ手順を踏める。
+
 ---
 
 **条件**: リポ内の `data/<task>/` サンプル＋`--model baseline`（上の baseline 行）。**GNSS** は正解を同じ NMEA から整合させているため、**RMSE は数値誤差レベル**になる（baseline の自己一致チェック用途）。**実行日**: 2026-04-27（手元ローカル1回、実行時間は目安）。

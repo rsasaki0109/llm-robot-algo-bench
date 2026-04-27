@@ -19,10 +19,11 @@
 |---------------------|------|----------------------|-----------------|-----------------------------|-------------|
 | `baseline` | 同梱実装 | ~0 / ~0 | 1.0 / 1.0 | 1.0 / 1.0 / 0.98 | 2026-04-27 |
 | `composer-2-fast` | *現状* baseline と同一実装※ | ≈0 / ≈0 | 1.0 / 1.0 | 1.0 / 1.0 / 0.98 | 2026-04-27 |
+| `opus-4.7` | *現状* baseline と同一実装※ | ≈0 / ≈0 | 1.0 / 1.0 | 1.0 / 1.0 / 0.98 | 2026-04-27 |
 | *未登録名* | → baseline フォールバック | 〃 | 〃 | 〃 | － |
 | *（例）* `xxx` | `model_registry` に個別登録 | ― | ― | ― | ― |
 
-※ **`composer-2-fast`** など未登録の `--model` は、いま **実行コードは `baseline` と同じ**（`runner/model_registry` のフォールバック）。**将来、LLM 生成の別実装を紐づけたら**、この行の数値は独立して意味を持つ。
+※ **`composer-2-fast`** / **`opus-4.7`** など未登録の `--model` は、いま **実行コードは `baseline` と同じ**（`runner/model_registry` のフォールバック）。**将来、LLM 生成の別実装を紐づけたら**、各モデル行の数値は独立して意味を持つ。
 
 ### 計画・制御
 
@@ -30,6 +31,7 @@
 |--------|----------------------------------------------|----------------------------|-------------|
 | `baseline` | 1.0 / 0 / 1.0 / 0.0 | 0 / 0 | 2026-04-27 |
 | `composer-2-fast` | 1.0 / 0 / 1.0 / 0.0 ※上と同条件 | 0 / 0 ※上と同条件 | 2026-04-27 |
+| `opus-4.7` | 1.0 / 0 / 1.0 / 0.0 ※上と同条件 | 0 / 0 ※上と同条件 | 2026-04-27 |
 | *未登録名* | 〃 | 〃 | － |
 | *（例）* `xxx` | ― 追記 ― | ― 追記 ― | ― |
 
@@ -45,7 +47,7 @@ bench run --task control   --input data/control/scenario.json   --model <名前>
 
 出力 `results/*.json` の `metrics` を上表に**1行**まとめて貼る（PR・コミットでOK）。`bench compare --dir results` で一覧化も可。
 
-補足: 同梱デモの数値解釈・再現コマンドの詳細は **[BENCHMARKS.md](BENCHMARKS.md)**。`--model composer-2-fast` の**生 JSON 指標**は **[docs/benchmarks/composer-2-fast.json](docs/benchmarks/composer-2-fast.json)**（baseline フォールバック時点）。
+補足: 同梱デモの数値解釈・再現コマンドの詳細は **[BENCHMARKS.md](BENCHMARKS.md)**。`--model` ごとの**生 JSON 指標**: [composer-2-fast](docs/benchmarks/composer-2-fast.json) / [opus-4.7](docs/benchmarks/opus-4.7.json)（**いずれも現状 baseline フォールバック**）。
 
 ### 参考：タスク別に何を測るか
 
