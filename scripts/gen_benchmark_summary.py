@@ -72,6 +72,24 @@ def _ac_summary(tasks: dict) -> tuple[str, str]:
         return ("—", "—")
     return (f"{ac}/{total}", f"{impl}/{total}")
 
+
+def _ac_per_task(tasks: dict) -> str:
+    """
+    例: "G✓ L✓ V✓ P✓ C✓" / "G✗ L✓ ..."
+    """
+    parts: list[str] = []
+    for k, lab in (
+        ("gnss", "G"),
+        ("lidar", "L"),
+        ("vision", "V"),
+        ("planning", "P"),
+        ("control", "C"),
+    ):
+        t = tasks.get(k, {})
+        ok = isinstance(t, dict) and t.get("quality_pass") is True
+        parts.append(f"{lab}{'✓' if ok else '✗'}")
+    return " ".join(parts)
+
 def _priority_section() -> str:
     return """## 評価の優先順位（このリポ）
 
@@ -125,12 +143,13 @@ def main() -> None:
         " **正しさ・合格**は各 `docs/benchmarks/<model>.json` の `metrics` / `quality_pass`、**コードの重さ**は `impl.code_metrics` を見る。"
         " 未登録 `model` は **baseline 実装**にフォールバック（`impl.used_fallback`）。\n"
     )
-    lines.append("| モデル | AC (`quality_pass`) | Impl (`!fallback`) | gnss (ms) | lidar (ms) | vision (ms) | planning (ms) | control (ms) | 5 タスク計 (ms) |")
-    lines.append("|--------|--------------------|-------------------|-----------|------------|-------------|---------------|--------------|------------|")
+    lines.append("| モデル | AC (`quality_pass`) | AC（タスク別） | Impl（非フォールバック） | gnss (ms) | lidar (ms) | vision (ms) | planning (ms) | control (ms) | 5 タスク計 (ms) |")
+    lines.append("|--------|--------------------|------------|-------------------------|-----------|------------|-------------|---------------|--------------|------------|")
     for m in order:
         if m in files:
             t = files[m].get("tasks", {})
             ac_s, impl_s = _ac_summary(t if isinstance(t, dict) else {})
+            ac_pt = _ac_per_task(t if isinstance(t, dict) else {})
             acc = 0.0
             rts = []
             for k in ("gnss", "lidar", "vision", "planning", "control"):
@@ -139,7 +158,7 @@ def main() -> None:
                     acc += float(ms)
                 rts.append(_fmt_ms(ms) if ms is not None else "—")
             lines.append(
-                f"| `{m}` | **{ac_s}** | {impl_s} | {rts[0]} | {rts[1]} | {rts[2]} | {rts[3]} | {rts[4]} | **~{_fmt_ms(acc)}** |"
+                f"| `{m}` | **{ac_s}** | {ac_pt} | {impl_s} | {rts[0]} | {rts[1]} | {rts[2]} | {rts[3]} | {rts[4]} | **~{_fmt_ms(acc)}** |"
             )
         else:
             continue
