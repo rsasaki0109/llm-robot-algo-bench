@@ -7,49 +7,149 @@
   "tasks": {
     "gnss": {
       "input": "data/gnss/sample.nmea",
-      "runtime_ms": 0.175,
+      "runtime_ms": 0.109,
       "metrics": {
         "rmse": 7.287473522531164e-13,
         "speed_error": 4.107048034995842e-13
+      },
+      "quality_pass": true,
+      "task_spec": {
+        "family": "sensors/geometry",
+        "difficulty_tier": 1,
+        "blurb": "NMEA パース＋自己整合。局所的な幾何・時系列内挿。",
+        "task": "gnss"
+      },
+      "impl": {
+        "source_file": "tasks/gnss/baseline.py",
+        "code_metrics": {
+          "file": "tasks/gnss/baseline.py",
+          "loc": 89,
+          "parse_ok": true,
+          "n_functions": 4,
+          "n_async_functions": 0,
+          "approx_decision_nodes": 8
+        },
+        "registry_hit": false,
+        "used_fallback": true
       }
     },
     "lidar": {
       "input": "data/lidar/points.npy",
-      "runtime_ms": 2.109,
+      "runtime_ms": 1.471,
       "metrics": {
         "cluster_count_score": 1.0,
         "mean_iou": 1.0,
         "n_pred_clusters": 3.0,
         "n_true_clusters": 3.0
+      },
+      "quality_pass": true,
+      "task_spec": {
+        "family": "point_cloud/clustering",
+        "difficulty_tier": 2,
+        "blurb": "点群からクラスタ。ラベリング/IoU 系。",
+        "task": "lidar"
+      },
+      "impl": {
+        "source_file": "tasks/lidar/baseline.py",
+        "code_metrics": {
+          "file": "tasks/lidar/baseline.py",
+          "loc": 27,
+          "parse_ok": true,
+          "n_functions": 1,
+          "n_async_functions": 0,
+          "approx_decision_nodes": 1
+        },
+        "registry_hit": false,
+        "used_fallback": true
       }
     },
     "vision": {
       "input": "data/vision/sample.jpg",
-      "runtime_ms": 2.786,
+      "runtime_ms": 2.019,
       "metrics": {
         "map50_simple": 1.0,
         "precision@0.5": 1.0,
         "recall@0.5": 1.0,
         "mean_iou_matched": 0.9843730773962929
+      },
+      "quality_pass": true,
+      "task_spec": {
+        "family": "image/detection",
+        "difficulty_tier": 2,
+        "blurb": "bbox 検出と mAP(簡易)。前処理・重なり。",
+        "task": "vision"
+      },
+      "impl": {
+        "source_file": "tasks/vision/baseline.py",
+        "code_metrics": {
+          "file": "tasks/vision/baseline.py",
+          "loc": 67,
+          "parse_ok": true,
+          "n_functions": 2,
+          "n_async_functions": 0,
+          "approx_decision_nodes": 7
+        },
+        "registry_hit": false,
+        "used_fallback": true
       }
     },
     "planning": {
       "input": "data/planning/scenario.json",
-      "runtime_ms": 0.366,
+      "runtime_ms": 0.267,
       "metrics": {
         "reaches_goal": 1.0,
         "length_excess": 0.0,
         "collision_free": 1.0,
         "waypoint_mae": 0.0
+      },
+      "quality_pass": true,
+      "task_spec": {
+        "family": "grid_path/graph",
+        "difficulty_tier": 3,
+        "blurb": "格子・障害・経路。探索/制約の扱い。",
+        "task": "planning"
+      },
+      "impl": {
+        "source_file": "tasks/planning/baseline.py",
+        "code_metrics": {
+          "file": "tasks/planning/baseline.py",
+          "loc": 79,
+          "parse_ok": true,
+          "n_functions": 4,
+          "n_async_functions": 0,
+          "approx_decision_nodes": 14
+        },
+        "registry_hit": false,
+        "used_fallback": true
       }
     },
     "control": {
       "input": "data/control/scenario.json",
-      "runtime_ms": 0.102,
+      "runtime_ms": 0.081,
       "metrics": {
         "rmse": 0.0,
         "max_abs": 0.0,
         "mean_abs": 0.0
+      },
+      "quality_pass": true,
+      "task_spec": {
+        "family": "ode/tracking",
+        "difficulty_tier": 2,
+        "blurb": "1 次系＋目標追従。制御則＋積分。",
+        "task": "control"
+      },
+      "impl": {
+        "source_file": "tasks/control/baseline.py",
+        "code_metrics": {
+          "file": "tasks/control/baseline.py",
+          "loc": 32,
+          "parse_ok": true,
+          "n_functions": 1,
+          "n_async_functions": 0,
+          "approx_decision_nodes": 2
+        },
+        "registry_hit": false,
+        "used_fallback": true
       }
     }
   }

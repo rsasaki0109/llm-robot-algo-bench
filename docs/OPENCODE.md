@@ -2,6 +2,8 @@
 
 [OpenCode](https://opencode.ai) はターミナル用のコーディングエージェントで、`opencode run -m provider/model` の形で**モデルを指定**できます。サブスクリプションや API キーで使える範囲は **`opencode auth login`** 済みのプロバイダに依存します（[CLI ドキュメント](https://opencode.ai/docs/cli/)）。
 
+**疎通（`opencode run` 1 発・`opencode_provider_smoke.json`）だけでは、ロボ 5 タスクの採点にはならない。** 比較の本体は、生成コードを [model_registry.py](../runner/model_registry.py) に載せたうえでの `bench run`。**理由と手順** → [OPENCODE_BENCH.md](OPENCODE_BENCH.md)。
+
 本リポの **`bench` は OpenCode の中で動くわけではない**ので、次の2段階に分かれます。
 
 1. **OpenCode 側**: 使える**最新**の `provider/model` を選び、必要ならコード生成用プロンプトを実行する。  
@@ -80,7 +82,8 @@ cd /path/to/llm-robot-algo-bench
 - [docs/benchmarks/opencode_provider_smoke.json](benchmarks/opencode_provider_smoke.json)（**bench 指標ではない**／CLI の応答確認のみ）
 - 一括再取得: `python3 scripts/refresh_opencode_provider_smoke.py`（続けて `python3 scripts/gen_benchmark_summary.py` で一覧に反映）
 
-`bench` の数値比較は、生成コードを `model_registry` に入れたあと、通常どおり `bench run --model <名前>`。
+`bench` の数値比較は、生成コードを `model_registry` に入れたあと、通常どおり `bench run --model <名前>`。  
+**「疎通だけ＝ベンチしたことにはならない」**の再掲: [OPENCODE_BENCH.md](OPENCODE_BENCH.md)。
 
 ## 参考
 

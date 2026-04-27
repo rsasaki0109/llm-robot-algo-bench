@@ -86,11 +86,15 @@ def _one_model_snapshot(model: str, tmp: Path) -> dict[str, Any]:
             raise RuntimeError(f"bench run failed: model={model!r} task={task!r} code={code}")
         d = json.loads(outj.read_text(encoding="utf-8"))
         abs_in = d.get("input", "")
-        out["tasks"][task] = {
+        tblock: dict[str, Any] = {
             "input": _rel_to_repo(ROOT, str(abs_in)) or inp_rel,
             "runtime_ms": d.get("runtime_ms"),
             "metrics": d.get("metrics", {}),
         }
+        for k in ("quality_pass", "task_spec", "impl"):
+            if k in d:
+                tblock[k] = d[k]
+        out["tasks"][task] = tblock
     return out
 
 

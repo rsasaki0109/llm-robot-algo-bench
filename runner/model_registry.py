@@ -53,6 +53,23 @@ CONTROL: Dict[str, ControlRun] = {
 }
 
 
+def is_registered(task: str, model: str) -> bool:
+    """レジストリに `model` があり、フォールバックでない。"""
+    m = model.strip()
+    t = task.lower()
+    if t == "gnss":
+        return m in GNSS
+    if t == "lidar":
+        return m in LIDAR
+    if t == "vision":
+        return m in VISION
+    if t == "planning":
+        return m in PLANNING
+    if t == "control":
+        return m in CONTROL
+    return False
+
+
 def get_gnss_runner(name: str) -> GnssRun:
     if name in GNSS:
         return GNSS[name]

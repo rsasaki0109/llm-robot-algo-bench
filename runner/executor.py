@@ -1,15 +1,20 @@
 from __future__ import annotations
 
+import inspect
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 from utils.timing import Timer
+from utils.code_complexity import analyze_python_path
+from utils.quality_gates import metrics_pass_for_task
+from utils.task_spec import get_task_spec
 from runner.model_registry import (
     get_control_runner,
     get_gnss_runner,
     get_lidar_runner,
     get_planning_runner,
     get_vision_runner,
+    is_registered,
 )
 
 from evaluator.common import load_json, resolve_ground_truth_path
@@ -41,15 +46,20 @@ def run_task(
     timer = Timer()
     with timer.block():
         if tname == "gnss":
-            pred = get_gnss_runner(model)(input_path, model=model, noise_m=noise)
+            runner = get_gnss_runner(model)
+            pred = runner(input_path, model=model, noise_m=noise)
         elif tname == "lidar":
-            pred = get_lidar_runner(model)(input_path, model=model, noise_std=noise)
+            runner = get_lidar_runner(model)
+            pred = runner(input_path, model=model, noise_std=noise)
         elif tname == "vision":
-            pred = get_vision_runner(model)(input_path, model=model, noise_std=noise)
+            runner = get_vision_runner(model)
+            pred = runner(input_path, model=model, noise_std=noise)
         elif tname == "planning":
-            pred = get_planning_runner(model)(input_path, model=model, noise=noise)
+            runner = get_planning_runner(model)
+            pred = runner(input_path, model=model, noise=noise)
         else:
-            pred = get_control_runner(model)(input_path, model=model, noise=noise)
+            runner = get_control_runner(model)
+            pred = runner(input_path, model=model, noise=noise)
 
     out: Dict[str, Any] = {
         "task": tname,
@@ -57,6 +67,24 @@ def run_task(
         "input": str(input_path.resolve()),
         "predictions": pred,
         "runtime_ms": round(timer.last_ms(), 3),
+        "task_spec": get_task_spec(tname),
+    }
+    _src = inspect.getfile(runner)
+    try:
+        _rel = str(Path(_src).resolve().relative_to(repo_root.resolve()))
+    except ValueError:
+        _rel = _src
+    _cm = analyze_python_path(_src)
+    if _cm and "file" in _cm:
+        try:
+            _cm["file"] = str(Path(_cm["file"]).resolve().relative_to(repo_root.resolve()))
+        except ValueError:
+            pass
+    out["impl"] = {
+        "source_file": _rel,
+        "code_metrics": _cm,
+        "registry_hit": is_registered(tname, model),
+        "used_fallback": not is_registered(tname, model),
     }
 
     gt_p = resolve_ground_truth_path(_default_gt_path(repo_root, tname), ground_truth)
@@ -77,4 +105,5 @@ def run_task(
             m = evaluate_control(pred, gt)
         out["metrics"] = m
         out["ground_truth_path"] = str(gt_p.resolve())
+        out["quality_pass"] = metrics_pass_for_task(tname, m)
     return out

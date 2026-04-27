@@ -16,6 +16,8 @@ from evaluator.planning import evaluate_planning
 from evaluator.vision import evaluate_vision
 from runner.executor import run_task
 from utils.bench_bars import runtime_bars_code_block
+from utils.quality_gates import metrics_pass_for_task
+from utils.task_spec import get_task_spec
 
 
 def _repo_root() -> Path:
@@ -164,6 +166,8 @@ def cmd_eval(args: argparse.Namespace) -> int:
         m = evaluate_control(pred, gt)
     data["metrics"] = m
     data["ground_truth_path"] = str(gt_path.resolve())
+    data["task_spec"] = get_task_spec(task)
+    data["quality_pass"] = metrics_pass_for_task(task, m)
     save_path = Path(args.out) if args.out else p
     save_json(save_path, data)
     print(json.dumps(m, ensure_ascii=False, indent=2))

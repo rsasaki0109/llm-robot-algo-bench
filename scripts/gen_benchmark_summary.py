@@ -16,6 +16,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from utils.bench_bars import runtime_bars_code_block
+from utils.task_spec import TASK_SPEC
 
 BDIR = ROOT / "docs" / "benchmarks"
 # 表示順: bench
@@ -81,6 +82,32 @@ def _order_opencode_ids(oc: dict[str, float]) -> list[str]:
         if m not in out:
             out.append(m)
     return out
+
+
+def _priority_section() -> str:
+    return """## 評価の優先順位（このリポ）
+
+1. **`metrics` / `quality_pass`** … 同梱データで**仕様を満たしたか**（主指標）
+2. **`impl.code_metrics`** … 実際に走った実装の**ソース規模・分岐の目安**（アルゴリズム/コード難易の補助。**`runtime_ms` とは独立**）
+3. **`task_spec.difficulty_tier`** … **出題上**の段階（1=軽め 3=重め。タスク種別の違い）
+4. **`runtime_ms`** … 参考（再現比較には使えるが、主目的ではない）
+
+"""
+
+
+def _task_tier_table() -> str:
+    lines: list[str] = [
+        "## タスク別・出題上の難易度（`task_spec`）\n",
+        "| タスク | tier | 系統 | メモ |",
+        "|--------|------|------|------|",
+    ]
+    for t in ("gnss", "lidar", "vision", "planning", "control"):
+        s = TASK_SPEC[t]
+        lines.append(
+            f"| `{t}` | {s['difficulty_tier']} | {s['family']} | {s['blurb']} |"
+        )
+    lines.append("")
+    return "\n".join(lines) + "\n"
 
 
 def _opencode_top_block(path: Path) -> str:
@@ -150,11 +177,21 @@ def main() -> None:
 
     lines: list[str] = []
     lines.append("# ベンチ結果（一覧）\n")
+    lines.append(_priority_section())
+    lines.append(_task_tier_table())
+    if opencode_smoke:
+        lines.append(
+            "> **疎通＝採点ではない**: 下の **OpenCode Go** ブロックは **`opencode run` 1 回**の接続・応答（`wall_ms`）の記録。"
+            " **GNSS / LiDAR / … の `metrics` や本ベンチの比較ではない**。"
+            " そのモデルで本当に測る手順: [../OPENCODE_BENCH.md](../OPENCODE_BENCH.md)（生成コード → `model_registry` → `bench run`）。\n\n"
+        )
     oc_top = _opencode_top_block(BDIR / OPENCODE_SMOKE_PATH)
     if oc_top:
         lines.append(oc_top)
     lines.append(
-        "同梱 `data/*` の **`bench run` → `runtime_ms` の一覧**（**品質**は各 JSON の `metrics` 参照。未登録 `model` は **baseline 実装**のため**数値は同系**）。\n"
+        "同梱 `data/*` で `bench run` した**クイック表**。"
+        " **正しさ・合格**は各 `docs/benchmarks/<model>.json` の `metrics` / `quality_pass`、**コードの重さ**は `impl.code_metrics` を見る。"
+        " 未登録 `model` は **baseline 実装**にフォールバック（`impl.used_fallback`）。\n"
     )
     if opencode_smoke:
         lines.append(
@@ -242,10 +279,11 @@ def main() -> None:
         lines.append(f"### {tk}\n")
         lines.append(runtime_bars_code_block(t_items))
 
-    lines.append("## 品質（要点・同梱自己整合）\n")
+    lines.append("## 品質・合格（`quality_pass` と `metrics`）\n")
     q = (
-        "上表の **bench 行**はいずれも **~0 誤差 / 1.0 スコア** 系（NMEA 自己整合、"
-        "LiDAR 3 クラ、Vision mAP(簡)~1 等・details は各 `metrics`）。**OpenCode Go 行**に品質指標はない。"
+        "同梱デモでは **bench** 系は `quality_pass` が真になりやすい（各 JSON → `tasks.<task>.quality_pass`）。"
+        " 精査は**生の** `metrics`。**出題難易**は `task_spec`、**実装の重さ**は `impl.code_metrics`（速さとは別）。"
+        " **OpenCode Go 行**に品質指標はない。"
     )
     lines.append(f"{q}\n")
     lines.append("## 元データ（JSON）\n")

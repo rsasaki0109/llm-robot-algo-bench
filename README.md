@@ -8,6 +8,9 @@
 - **JSON＋SUMMARY を同梱データで作り直す（推奨）**: `python3 scripts/refresh_benchmark_docs.py` → `docs/benchmarks/<model>.json` を上書きし、続けて `gen_benchmark_summary.py` で [SUMMARY.md](docs/benchmarks/SUMMARY.md) を更新。
 - **SUMMARY だけ**既存 JSON から再生成: `python3 scripts/gen_benchmark_summary.py`。
 
+**比較の主軸**は **正しさ**（`metrics` / `quality_pass`）と、必要なら **実装の複雑度**（`impl.code_metrics`、実ソースの LOC・分岐目安）。**`runtime_ms` は補助**。**出題上の難易度**は `task_spec.difficulty_tier`（タスク種別）で分けている。詳細は [SUMMARY.md](docs/benchmarks/SUMMARY.md) 冒頭。  
+**AtCoder 風に「テストで AC か」をやるイメージ**は [docs/BENCH_JUDGE.md](docs/BENCH_JUDGE.md)（サンプル／ジャッジ／隠しテストの対応表と、多ケース化の次の一歩）。
+
 **何ができる？** ロボ向け **5 タスク**（**GNSS / LiDAR / 画像 / 計画 `planning` / 制御 `control`）のパイプラインに対し、**同じ入力**で **生成アルゴ or baseline** を走らせ、**数値＋JSON** で比較する。**GPU 不要・ローカル CLI**（`bench run`）。
 
 **知覚（センサ・画像）**に加え、**動作計画（グリッド上の経路）**と **制御（1 次系追従）** も**同列のタスク**として入っています（`tasks/`＋`evaluator/`＋`model_registry`）。
@@ -88,7 +91,7 @@ bench run --task control   --input data/control/scenario.json   --model <名前>
 
 **Cursor での書き方**: エディタ内で **Composer（2 Fast）** や **Opus 4.7** を選んで生成したコードを、上の `composer-2-fast` / `opus-4.7` に紐づけて登録する（**[docs/CURSOR.md](docs/CURSOR.md)**）。定数だけ使う場合は `utils/cursor_models.py` の `COMPOSER_2_FAST` / `OPUS_4_7`。
 
-**OpenCode CLI**（端末）で **`opencode models`** / **`opencode run -m provider/model`** を使う場合は **[docs/OPENCODE.md](docs/OPENCODE.md)**。サブスクリプション内の最新IDは `opencode models --refresh` で確認 → 一括 `bench` は **`scripts/bench_opencode_smoke.sh`**。**Kimi 2.6 / Qwen 3.6+ / DeepSeek v4 Pro** 等の疎通ログ例: [docs/benchmarks/opencode_provider_smoke.json](docs/benchmarks/opencode_provider_smoke.json)（`bench` の得点ではない）。
+**OpenCode CLI**（端末）で **`opencode models`** / **`opencode run -m provider/model`** を使う場合は **[docs/OPENCODE.md](docs/OPENCODE.md)**。サブスクリプション内の最新IDは `opencode models --refresh` で確認 → 一括 `bench` は **`scripts/bench_opencode_smoke.sh`**。**疎通ログ**（`bench` の得点ではない）: [opencode_provider_smoke.json](docs/benchmarks/opencode_provider_smoke.json)。**5 タスクを本当に測るには** [docs/OPENCODE_BENCH.md](docs/OPENCODE_BENCH.md)（生成コードを `model_registry` に載せる）。
 
 ## タスク一覧（MVP＝5 本）
 
