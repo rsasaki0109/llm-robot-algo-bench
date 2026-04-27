@@ -23,14 +23,23 @@ jobs:
       - name: bench run (sample data)
         run: |
           set -e
-          bench run --task gnss --input data/gnss/sample.nmea --model baseline --out /tmp/r_gnss.json
-          bench run --task lidar --input data/lidar/points.npy --model baseline --out /tmp/r_lidar.json
-          bench run --task vision --input data/vision/sample.jpg --model baseline --out /tmp/r_vision.json
+          bench run --task gnss     --input data/gnss/sample.nmea      --model baseline --out /tmp/r_gnss.json
+          bench run --task lidar    --input data/lidar/points.npy      --model baseline --out /tmp/r_lidar.json
+          bench run --task vision   --input data/vision/sample.jpg     --model baseline --out /tmp/r_vision.json
+          bench run --task planning --input data/planning/scenario.json --model baseline --out /tmp/r_plan.json
+          bench run --task control  --input data/control/scenario.json  --model baseline --out /tmp/r_ctrl.json
       - name: Assert metrics
         run: |
           python - <<'PY'
           import json
-          for p in ("/tmp/r_gnss.json", "/tmp/r_lidar.json", "/tmp/r_vision.json"):
+          paths = (
+              "/tmp/r_gnss.json",
+              "/tmp/r_lidar.json",
+              "/tmp/r_vision.json",
+              "/tmp/r_plan.json",
+              "/tmp/r_ctrl.json",
+          )
+          for p in paths:
               with open(p) as f:
                   d = json.load(f)
               assert "metrics" in d, p

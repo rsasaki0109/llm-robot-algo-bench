@@ -3,28 +3,40 @@
 ![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)
 ![CI smoke](https://github.com/rsasaki0109/llm-robot-algo-bench/actions/workflows/smoke.yml/badge.svg)
 
-**何ができる？** ロボ向け **MVP として 3 本**（**GNSS / LiDAR / 画像**）のパイプラインに対し、**同じ入力**で **生成アルゴ or baseline** を走らせ、**数値＋JSON** で比較する。**GPU 不要・ローカル CLI**（`bench run`）。
+**何ができる？** ロボ向け **5 タスク**（**GNSS / LiDAR / 画像 / 計画 `planning` / 制御 `control`）のパイプラインに対し、**同じ入力**で **生成アルゴ or baseline** を走らせ、**数値＋JSON** で比較する。**GPU 不要・ローカル CLI**（`bench run`）。
 
-**GNSS や点群は「知覚（perception）＋幾何」寄り**に映りやすいが、**この基盤の意図は知覚だけに閉じない**。ロボの肝である **制御（control）**・**動作計画（planning / motion）** も、**同じ `tasks/` + `evaluator/` + `bench run --task` の枠**で拡張する想定（下記「拡張ロードマップ」）。
+**知覚（センサ・画像）**に加え、**動作計画（グリッド上の経路）**と **制御（1 次系追従）** も**同列のタスク**として入っています（`tasks/`＋`evaluator/`＋`model_registry`）。
 
 ---
 
 ## 各モデル（LLM）別ベンチマーク結果
 
-**同じ同梱サンプル**（`data/gnss`, `data/lidar`, `data/vision`）に対する**主要指標**を並べる。**ここを更新していく**と、来訪者が一発で比較できます。
+**同じ同梱サンプル**（`data/*` 各タスク）に対する**主要指標**を並べる。**ここを更新していく**と、来訪者が一発で比較できます。
 
-| モデル名 (`--model`) | 実体の説明 | GNSS: RMSE (m) / 速度誤差 (m/s) | LiDAR: 数一致 / mean IoU | Vision: mAP(簡) / p@0.5 / マッチ IoU | 測定日 (UTC) |
-|---------------------|------------|--------------------------------|--------------------------|--------------------------------------|-------------|
-| `baseline` | 同梱の参考実装 | ~0 / ~0 | 1.0 / 1.0 | 1.0 / 1.0 / 0.98 | 2026-04-27 |
-| *（未登録の名前）* | レジストリ未登録時は上と**同じ** baseline | 〃 | 〃 | 〃 | － |
-| *（例）* `gpt-4.1` 等 | 生成コードを `model_registry` 登録後 | ― 追記 ― | ― 追記 ― | ― 追記 ― | ― |
+### 知覚・センサ系
 
-**出し方（追記用）** — 3タスクとも同梱パスで実行:
+| モデル名 (`--model`) | 実体 | GNSS: RMSE / 速度誤差 | LiDAR: 数 / IoU | Vision: mAP(簡) / p0.5 / IoU | 測定日 (UTC) |
+|---------------------|------|----------------------|-----------------|-----------------------------|-------------|
+| `baseline` | 同梱実装 | ~0 / ~0 | 1.0 / 1.0 | 1.0 / 1.0 / 0.98 | 2026-04-27 |
+| *未登録名* | → baseline フォールバック | 〃 | 〃 | 〃 | － |
+| *（例）* `xxx` | `model_registry` 登録後 | ― | ― | ― | ― |
+
+### 計画・制御
+
+| モデル | planning: 到達 / 長さ超過 / 衝突なし / way MAE | control: `rmse` / `max_abs` | 測定日 (UTC) |
+|--------|----------------------------------------------|----------------------------|-------------|
+| `baseline` | 1.0 / 0 / 1.0 / 0.0 | 0 / 0 | 2026-04-27 |
+| *未登録名* | 〃 | 〃 | － |
+| *（例）* `xxx` | ― 追記 ― | ― 追記 ― | ― |
+
+**出し方（追記用）** — 同梱パス例:
 
 ```bash
-bench run --task gnss   --input data/gnss/sample.nmea   --model <名前>
-bench run --task lidar  --input data/lidar/points.npy   --model <名前>
-bench run --task vision --input data/vision/sample.jpg  --model <名前>
+bench run --task gnss      --input data/gnss/sample.nmea       --model <名前>
+bench run --task lidar     --input data/lidar/points.npy        --model <名前>
+bench run --task vision    --input data/vision/sample.jpg     --model <名前>
+bench run --task planning  --input data/planning/scenario.json  --model <名前>
+bench run --task control   --input data/control/scenario.json   --model <名前>
 ```
 
 出力 `results/*.json` の `metrics` を上表に**1行**まとめて貼る（PR・コミットでOK）。`bench compare --dir results` で一覧化も可。
@@ -38,6 +50,8 @@ bench run --task vision --input data/vision/sample.jpg  --model <名前>
 | **gnss** | NMEA → ENU ＋ 速度 | `rmse`, `speed_error` | **~0.2** |
 | **lidar** | 点群クラスタ | `cluster_count_score`, `mean_iou` | **~6** |
 | **vision** | 人物 bbox | `map50_simple`, `precision@0.5`, `mean_iou_matched` | **~13** |
+| **planning** | 2D 格子＋障害、A* 経路 | `reaches_goal`, `length_excess`, `collision_free`, `waypoint_mae` | **~0.2** |
+| **control** | 1 次系＋P 制御追従 | `rmse`, `max_abs`, `mean_abs` | **~0.1** |
 
 \*1台のPCで前後。実データの別セットで測る場合は、表の「備考」列にデータ名を足すとよい。
 
@@ -61,13 +75,15 @@ bench run --task vision --input data/vision/sample.jpg  --model <名前>
 
 `--model` は **`runner/model_registry.py`** の辞書で解決。未登録名は **`baseline` にフォールバック**。
 
-## 3タスク（MVP）一覧
+## タスク一覧（MVP＝5 本）
 
 | タスク | 入力 | 処理（baseline） | 指標（例） |
 |--------|------|------------------|------------|
 | `gnss` | NMEA | GGA → 第1 GGA 原点 ENU、時刻差分で速度 | `rmse`, `speed_error` |
-| `lidar` | `.npy` / 簡易PCD | `DBSCAN` | `cluster_count_score`, `mean_iou` ほか |
+| `lidar` | `.npy` / 簡易 PCD | `DBSCAN` | `cluster_count_score`, `mean_iou` ほか |
 | `vision` | 画像 | 輪郭＋簡易人物 bbox（失敗時 HOG フォールバック） | `map50_simple` 等 |
+| `planning` | JSON（格子・始点終点） | 4 近傍 A-star 経路 | 上表 |
+| `control` | JSON（`p_ref`・`dt`・`K` 等） | 飽和付き 1 次追従 | 上表 |
 
 ## 前提
 
@@ -88,7 +104,7 @@ pip install -e .
 ## CLI
 
 ```text
-bench run  --task <gnss|lidar|vision> --input <path> --model <name> [--out OUT] [--ground-truth PATH] [--noise F] [--viz]
+bench run  --task <gnss|lidar|vision|planning|control> --input <path> --model <name> [--out OUT] [--ground-truth PATH] [--noise F] [--viz]
 bench eval --task <...>  --result <result.json> [--out OUT] [--ground-truth PATH]
 bench compare --dir <results_dir>
 ```
@@ -110,18 +126,16 @@ bench compare --dir <results_dir>
 
 `predictions` 等は追試用に同梱。
 
-## 拡張ロードマップ（知覚に閉じない）
+## 拡張ロードマップ（上の先）
 
-| 層 | 例（候補） | 本リポでの足し方（方針） |
-|----|------------|--------------------------|
-| **計画 (planning)** | グリッド/グラフ上の経路、障害物回避、時刻制約 | `tasks/planning/`, 参照軌跡＋`evaluator/planning.py`、入力は JSON/点列など固定形式 |
-| **制御 (control)** | 追従、PID/フィードバック、簡易 MPC、トルク/速度の整合 | `tasks/control/`, 参照信号＋`evaluator/control.py`（例: 追従誤差、違反率） |
-| **知覚・センサ** | 現行の `gnss` / `lidar` / `vision`、今後 **SLAM / 融合** も同様 | 独立 `tasks/*` ＋対応 evaluator |
-| **横断** | `model_registry`、CI に `--task` を足す、README の表に行を追加 | 差し替え比較の作法は同じ |
+| 層 | 例（次の一手） | 方針 |
+|----|---------------|------|
+| **計画** | ダイクストラ以外の法則、時刻窓、キノダイナミクス的コスト | `tasks/planning/` 差し替え＋`evaluator` 拡張 |
+| **制御** | 2 次系、状態制約、簡易 MPC / PID チューニング比較 | `tasks/control/` 差し替え |
+| **知覚・推定** | **SLAM / センサ融合**、追加センサ | 新 `tasks/*` ＋ evaluator |
+| **横断** | `model_registry`、README 表、CI | 既存のまま |
 
-**制御と計画は知覚と同格で重要**（むしろ実機では重みが大きい）。MVP では扱いやすいセンサ系から入っているだけで、**目的は「LLM にロボのどの層のコードを書かせるか」を同じ枠で測ること**。
-
-その他: **LLM コード差し替え**は `model_registry` か一時生成＋`importlib`。**CI**は `.github/workflows/smoke.yml`（タスクが増えたらジョブに `--task` 追加）。
+**制御と計画は本リポで既にタスク化済み**（`planning` / `control`）。**LLM コード差し替え**は `model_registry` か一時生成＋`importlib`。**CI**は `.github/workflows/smoke.yml`（5 タスクスモーク）。
 
 ---
 
@@ -130,6 +144,8 @@ bench compare --dir <results_dir>
 - GNSS: `data/gnss/sample.nmea`, `data/gnss/ground_truth.json`
 - LiDAR: `data/lidar/points.npy`, `data/lidar/ground_truth.json`
 - Vision: `data/vision/sample.jpg`, `data/vision/ground_truth.json`
+- Planning: `data/planning/scenario.json`, `data/planning/ground_truth.json`（`ref_path` 付き）
+- Control: `data/control/scenario.json`, `data/control/ground_truth.json`（`ref_trajectory` 付き）
 
 **数値の詳しい表** → [BENCHMARKS.md](BENCHMARKS.md)  
 **GitHub の「About」用テキスト** → [GITHUB_ABOUT.md](GITHUB_ABOUT.md)

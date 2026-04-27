@@ -5,13 +5,13 @@ GitHub の **Settings はファイルでは置けない**ため、**リポのト
 ## Description（1行・英語向け / 国際閲覧用）
 
 ```
-Lightweight, GPU-free Python CLI to benchmark LLM-generated robotics code: GNSS (NMEA→ENU), LiDAR (DBSCAN), and vision (person boxes). Swappable `model` hooks + JSON metrics.
+Lightweight, GPU-free Python CLI to benchmark LLM-generated robotics code: perception (GNSS, LiDAR, vision) plus planning (grid A*) and control (1st-order tracking). Swappable `model` hooks + JSON metrics.
 ```
 
 **日本メインにしたい場合（短）:**
 
 ```
-ローカル専用・GPU不要。NMEA/点群/画像の3タスクをCLIで評価。LLMが書いた algo を差し替えて JSON で比較。
+GPU不要。GNSS/点群/画像に加えグリッド計画(Planning)と追従制御(Control)をCLI＋JSONで比較。LLMのalgo差し替え可。
 ```
 
 ## Website（任意）
@@ -30,13 +30,15 @@ benchmark robotics llm generative-ai python
 gnss nmea enu
 lidar point-cloud dbscan
 computer-vision opencv
+motion-planning path-planning
+control-theory tracking
 cli numpy scikit-learn
 ```
 
 短くするなら最低限:
 
 ```
-benchmark robotics llm python gnss lidar computer-vision
+benchmark robotics llm python gnss lidar computer-vision motion-planning control
 ```
 
 ## README の CI バッジ（フォーク先）

@@ -33,6 +33,24 @@
 | `mean_iou_matched` | 約 0.984 |
 | `runtime_ms` | 約 13.3 |
 
+### Planning（`data/planning/scenario.json`）
+
+| メトリクス | 値（参考） |
+|------------|------------|
+| `reaches_goal` | 1.0 |
+| `length_excess` | 0.0 |
+| `collision_free` | 1.0 |
+| `waypoint_mae` | 0.0 |
+| `runtime_ms` | 約 0.2 |
+
+### Control（`data/control/scenario.json`）
+
+| メトリクス | 値（参考） |
+|------------|------------|
+| `rmse` | 0.0（自己一致） |
+| `max_abs` / `mean_abs` | 0.0 |
+| `runtime_ms` | 約 0.1 |
+
 ## 再現手順
 
 ```bash
@@ -41,6 +59,8 @@ pip install -e .
 bench run --task gnss   --input data/gnss/sample.nmea   --model baseline
 bench run --task lidar  --input data/lidar/points.npy    --model baseline
 bench run --task vision --input data/vision/sample.jpg   --model baseline
+bench run --task planning --input data/planning/scenario.json  --model baseline
+bench run --task control  --input data/control/scenario.json   --model baseline
 ```
 
 出力 JSON には上記 `metrics` と `runtime_ms` が含まれる。自環境の数値比較用に `results/` に保存して `bench compare --dir results` も可。

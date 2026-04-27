@@ -9,8 +9,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from evaluator.common import load_json, save_json
+from evaluator.control import evaluate_control
 from evaluator.gnss import evaluate_gnss
 from evaluator.lidar import evaluate_lidar
+from evaluator.planning import evaluate_planning
 from evaluator.vision import evaluate_vision
 from runner.executor import run_task
 
@@ -61,6 +63,35 @@ def _save_viz(root: Path, task: str, res: Dict[str, Any], inp: Path) -> None:
             x, y, w, h = int(d["x"]), int(d["y"]), int(d["w"]), int(d["h"])
             cv2.rectangle(bgr, (x, y), (x + w, y + h), (0, 200, 0), 2)
         cv2.imwrite(str(out_dir / f"vision_{inp.stem}.jpg"), bgr)
+    elif task == "planning":
+        import json
+        import numpy as np
+
+        spec = json.loads(inp.read_text())
+        g = np.array(spec.get("grid", []), dtype=float)
+        path = res.get("predictions", {}).get("path", [])
+        fig, ax = plt.subplots()
+        if g.size:
+            ax.imshow(g, cmap="gray_r", origin="upper")
+        if path:
+            ys = [p[0] for p in path]
+            xs = [p[1] for p in path]
+            ax.plot(xs, ys, "r.-", linewidth=2, markersize=6)
+        ax.set_title("Grid path (pred)")
+        fig.savefig(out_dir / f"planning_{inp.stem}.png", dpi=120)
+        plt.close(fig)
+    elif task == "control":
+        pred = res.get("predictions", {})
+        pr = [float(x) for x in pred.get("p_ref", [])]
+        y = [float(x) for x in pred.get("trajectory", [])]
+        if pr and y and len(pr) == len(y):
+            fig, ax = plt.subplots()
+            ax.plot(pr, "k--", label="p_ref")
+            ax.plot(y, "C0-", label="traj")
+            ax.legend()
+            ax.set_title("1D tracking")
+            fig.savefig(out_dir / f"control_{inp.stem}.png", dpi=120)
+            plt.close(fig)
 
 
 def _resolve_out_path(
@@ -88,7 +119,13 @@ def cmd_run(args: argparse.Namespace) -> int:
         ground_truth=gt_path,
         noise=args.noise,
     )
-    if args.viz and args.task in ("gnss", "vision", "lidar"):
+    if args.viz and args.task in (
+        "gnss",
+        "vision",
+        "lidar",
+        "planning",
+        "control",
+    ):
         _save_viz(root, args.task, res, inp)
     out_path = _resolve_out_path(args, root, res)
     save_json(out_path, res)
@@ -104,7 +141,7 @@ def cmd_eval(args: argparse.Namespace) -> int:
         return 2
     data = load_json(p)
     task = (args.task or data.get("task", "")).lower()
-    if task not in ("gnss", "lidar", "vision"):
+    if task not in ("gnss", "lidar", "vision", "planning", "control"):
         print("タスク名が不正、または result に task がありません", file=sys.stderr)
         return 2
     def_gt = _default_gt_for_task(root, task)
@@ -118,8 +155,12 @@ def cmd_eval(args: argparse.Namespace) -> int:
         m = evaluate_gnss(pred, gt)
     elif task == "lidar":
         m = evaluate_lidar(pred, {"cluster_labels": gt.get("cluster_labels", [])})
-    else:
+    elif task == "vision":
         m = evaluate_vision(pred, gt)
+    elif task == "planning":
+        m = evaluate_planning(pred, gt)
+    else:
+        m = evaluate_control(pred, gt)
     data["metrics"] = m
     data["ground_truth_path"] = str(gt_path.resolve())
     save_path = Path(args.out) if args.out else p
@@ -194,7 +235,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sp = p.add_subparsers(dest="command", required=True)
     r = sp.add_parser("run", help="推論（baseline/将来は生成コード）と評価")
-    r.add_argument("--task", required=True, choices=["gnss", "lidar", "vision"])
+    r.add_argument(
+        "--task",
+        required=True,
+        choices=["gnss", "lidar", "vision", "planning", "control"],
+    )
     r.add_argument("--input", required=True, type=str)
     r.add_argument("--model", default="baseline", type=str)
     r.add_argument("--out", type=str, default=None, help="出力 JSON パス（省略時 results/）")
