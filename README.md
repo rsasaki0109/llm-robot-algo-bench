@@ -1,37 +1,54 @@
 # llm-robot-algo-bench
 
+![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)
+![CI smoke](https://github.com/rsasaki0109/llm-robot-algo-bench/actions/workflows/smoke.yml/badge.svg)
+
+**何ができる？** ロボティクス向けの小さな3タスク（**GNSS / LiDAR / 画像**）について、**同じ入力**で **生成アルゴor baseline** を走らせ、**数値＋JSON**で比較する。**GPU不要・ローカルCLI**（`bench run`）。
+
+---
+
+## まずここ：同梱サンプル＋`baseline` の「結果の目安」
+
+| タスク | 同梱データで何を見る？ | 主な指標（**デモ**・参考） | 目安 `runtime_ms`* |
+|--------|------------------------|---------------------------|--------------------|
+| **gnss** | NMEA → ENU ＋ 速度 | `rmse` ≈ **0 m**、速度誤差 ≈ **0**（正解を同一NMEAに整合） | **~0.2** |
+| **lidar** | 点群のクラスタ | クラス数 **一致 1.0**、**IoU 1.0**（3クラス） | **~6** |
+| **vision** | 1枚で人物 bbox | mAP(簡易) **1.0** 付近、**IoU ~0.98** | **~13** |
+
+\*1台のPCだと前後する。**実データ**では数値は悪化する。再現用コマンドと注意は **[BENCHMARKS.md](BENCHMARKS.md)**。
+
+---
+
 ## プロジェクト概要
 
-`llm-robot-algo-bench` は、**LLM が生成したロボティクス用アルゴリズム（またはそのスタブ）**を、**同一入出力仕様**で差し替え、指標付きで比較するための**ローカル実行向け**ベンチマーク基盤（MVP）です。GPU 不要の依存のみで、CLI から入力データを与え、JSON で結果を受け取ります。
+`llm-robot-algo-bench` は、**LLM が生成したロボティクス用アルゴリズム**（やスタブ）を、**同一入出力**で差し替え、指標付きで比較する**ベンチマーク基盤（MVP）**です。GPU 不要の依存のみ。CLI から入れて JSON を受け取れます。
 
 ## 「LLMがロボットアルゴリズムを書けるか？」
 
-実運用に即して評価するには、生成コードが**センサ形式・座標系・制約**を正しく扱い、**再現性のある**形で出せるかを切り分ける必要があります。本ツールは、
+実運用の前に、生成コードが**センサ形式・座標系**を扱い、**再現**できるかを分けたい。本リポは、
 
 - **タスク定義**（入出力と評価式）を先に固定し、
-- **runner** が同じ I/O 契約のもと「コードを実行」する責務に閉じ、
-- **evaluator** はメトリクス計算に閉じる、
+- **runner** は「同じI/Oで実行」だけ、
+- **evaluator** は指標計算だけ、
 
-という分離で、**将来 LLM 生成コードの差し替え**（あるいはバンドル/動的 import）に耐える形にしています。
+に分け、**将来、LLM生成コードを `model` に差し替え**しやすい形にしています（現状 `baseline` 実装＋レジストリ）。
 
-### model 名と実装の対応
+### model 名と実装
 
-`--model` は **`runner/model_registry.py`** の辞書で実装に解決されます。未登録名は従来どおり **`baseline`** にフォールバックします。別アルゴリズムを足すなら、各タスクの `run_*` 関数を実装し、`GNSS` / `LIDAR` / `VISION` に1行足してください。
+`--model` は **`runner/model_registry.py`** の辞書で解決。未登録名は **`baseline` にフォールバック**。
 
-## 3タスク（MVP）
+## 3タスク（MVP）一覧
 
 | タスク | 入力 | 処理（baseline） | 指標（例） |
 |--------|------|------------------|------------|
-| `gnss` | NMEA（`.txt` 想定。サンプルは `sample.nmea`） | GGA 取得 → 第1 GGA 原点 ENU 変換、時刻差分で速度 | `rmse`, `speed_error` |
-| `lidar` | 点群（`.npy` または簡易 ASCII PCD） | `DBSCAN` | `cluster_count_score`, `mean_iou` ほか |
-| `vision` | 画像（`.jpg` 等、OpenCVで読み込み） | 輪郭＋条件で縦長ブロブ、ダメなら HOG フォールバック | `map50_simple`, `precision@0.5`, `recall@0.5`, `mean_iou_matched` |
-
-各タスクの正解（または参照）データは `data/<task>/ground_truth.json`（LiDAR は `cluster_labels` が点順と一致）に置きます。GNSS の正解は**同じ NMEA をパーサ＋WGS84→ENU した結果**に合わせてあり、baseline では自整合（RMSE ≈ 0）になります。
+| `gnss` | NMEA | GGA → 第1 GGA 原点 ENU、時刻差分で速度 | `rmse`, `speed_error` |
+| `lidar` | `.npy` / 簡易PCD | `DBSCAN` | `cluster_count_score`, `mean_iou` ほか |
+| `vision` | 画像 | 輪郭＋簡易人物 bbox（失敗時 HOG フォールバック） | `map50_simple` 等 |
 
 ## 前提
 
 - Python 3.10 以上
-- 推奨: 仮想環境（`python3 -m venv .venv`）
+- 推奨: 仮想環境
 
 ## インストール
 
@@ -42,55 +59,52 @@ python3 -m venv .venv
 pip install -e .
 ```
 
-`pip install` が使えない場合は、プロジェクトルートを `PYTHONPATH` に加えて `python -m cli.main` を実行しても同様です（例: `PYTHONPATH=. python -m cli.main run ...`）。
+`pip` が使えない場合: `PYTHONPATH=.` を付けて `python -m cli.main run ...` でも可。
 
-## CLI 使い方
+## CLI
 
 ```text
 bench run  --task <gnss|lidar|vision> --input <path> --model <name> [--out OUT] [--ground-truth PATH] [--noise F] [--viz]
-bench eval --task <gnss|lidar|vision>  --result <result.json> [--out OUT] [--ground-truth PATH]
+bench eval --task <...>  --result <result.json> [--out OUT] [--ground-truth PATH]
 bench compare --dir <results_dir>
 ```
 
-- **`run`**: 指定タスクの baseline を動かし、データディレクトリ内の正解があれば即時に `metrics` を付与して JSON を `results/` に保存（`--out` で上書き可）。
-- **`eval`**: 既存 `result.json` の `predictions` から再評価（正解パス差し替え可）。
-- **`compare`**: ディレクトリ内の `*.json`（`metrics` 付き）を集め、`leaderboard.md` / `leaderboard.csv` を生成。`leaderboard*.json` は除外。
+- **`run`**: baseline（または登録実装）を実行し、正解があれば `metrics` を付けて `results/` に JSON（`--out`で指定可）
+- **`eval`**: 保存済み `result.json` から再評価
+- **`compare`**: 複数 JSON を表に（`leaderboard.md` / `.csv`）。GitHub の「About」文案は **[GITHUB_ABOUT.md](GITHUB_ABOUT.md)**（コピペ用）
 
-## 出力 JSON の形（必須フィールド例）
+## 出力 JSON（例）
 
 ```json
 {
   "task": "gnss",
-  "model": "gpt-5",
-  "metrics": {
-    "rmse": 0.0,
-    "speed_error": 0.0
-  },
+  "model": "baseline",
+  "metrics": { "rmse": 0.0, "speed_error": 0.0 },
   "runtime_ms": 0.2
 }
 ```
 
-`run` の完全な成果物には、追試験用に `input` や `predictions` も入ります。
+`predictions` 等は追試用に同梱。
 
-## 拡張の方向
+## 拡張
 
-- **SLAM / センサ融合**: `tasks/slam/`, `evaluator/slam.py` のように、独立モジュール＋専用 evaluator を追加し、`runner.executor.run_task` に分岐を足す想定。
-- **LLM 生成コード差し替え**: 上記レジストリ（`runner/model_registry.py`）に登録する、または一時ディレクトリに生成コードを書き `importlib` で読み込む等。
-- **CI**: `.github/workflows/smoke.yml` で同梱サンプルに対する `bench run` を回します。
-- **重い検出器**: 依存（例: 追加の DNN 重み）を分離し、オプション group でインストール。
+- **SLAM / 融合**など: 独立 `tasks/*` ＋ evaluator を足す
+- **LLM コード差し替え**: `model_registry` か、一時生成＋`importlib`
+- **CI**: `.github/workflows/smoke.yml` で同梱サンプルに `bench run`
 
-## サンプル（リポジトリ同梱）
+## 同梱サンプル
 
 - GNSS: `data/gnss/sample.nmea`, `data/gnss/ground_truth.json`
 - LiDAR: `data/lidar/points.npy`, `data/lidar/ground_truth.json`
 - Vision: `data/vision/sample.jpg`, `data/vision/ground_truth.json`
 
-**baseline の参考スコア・実行時間**は [BENCHMARKS.md](BENCHMARKS.md) を参照（同梱デモ用の目安。実データでは下がる）。
+**数値の詳しい表** → [BENCHMARKS.md](BENCHMARKS.md)  
+**GitHub の「About」用テキスト** → [GITHUB_ABOUT.md](GITHUB_ABOUT.md)
 
-## 付録: 正解再生成（GNSS）
+## 付録: GNSS 正解
 
-NMEA 本文を変えたら、`data/gnss/ground_truth.json` を baseline と同じ手順の値に揃えてください。開発者向けに、パーサ＋`lla2enu` から一発で書き出すスニペットをリポジトリ内ドキュメントに残すのが安全です（現リポはサンプル用に揃え済み）。
+NMEA を変えたら `data/gnss/ground_truth.json` を baseline と同じ手順で揃え直すこと。
 
 ## ライセンス
 
-本リポジトリ利用に際して、利用目的に合わせて必要ならライセンス行を追記してください（未設定のまま利用可のテンプレートとして扱います）。
+未設定。必要に応じて好きなライセンス行を足してください。
