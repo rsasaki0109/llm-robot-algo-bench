@@ -1,12 +1,13 @@
 {
   "model": "opus-4.7",
   "date_utc": "2026-04-27",
-  "host_note": "model_registry 未登録のため baseline 実装。指標は同梱デモ自己整合。",
+  "executed_by": "Cursor agent: bench run x5 (registry fallback = baseline impl)",
+  "host_note": "未登録のため baseline 実装。指標は同梱自己整合。",
   "bench_version_hint": "llm-robot-algo-bench リポ同梱 data/",
   "tasks": {
     "gnss": {
       "input": "data/gnss/sample.nmea",
-      "runtime_ms": 0.262,
+      "runtime_ms": 3.754,
       "metrics": {
         "rmse": 7.287473522531164e-13,
         "speed_error": 4.107048034995842e-13
@@ -14,7 +15,7 @@
     },
     "lidar": {
       "input": "data/lidar/points.npy",
-      "runtime_ms": 2.42,
+      "runtime_ms": 5.631,
       "metrics": {
         "cluster_count_score": 1.0,
         "mean_iou": 1.0,
@@ -24,7 +25,7 @@
     },
     "vision": {
       "input": "data/vision/sample.jpg",
-      "runtime_ms": 14.412,
+      "runtime_ms": 16.516,
       "metrics": {
         "map50_simple": 1.0,
         "precision@0.5": 1.0,
@@ -34,7 +35,7 @@
     },
     "planning": {
       "input": "data/planning/scenario.json",
-      "runtime_ms": 0.325,
+      "runtime_ms": 3.55,
       "metrics": {
         "reaches_goal": 1.0,
         "length_excess": 0.0,
@@ -44,7 +45,7 @@
     },
     "control": {
       "input": "data/control/scenario.json",
-      "runtime_ms": 0.123,
+      "runtime_ms": 0.151,
       "metrics": {
         "rmse": 0.0,
         "max_abs": 0.0,

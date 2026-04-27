@@ -1,0 +1,33 @@
+{
+  "kind": "opencode_run_smoke",
+  "date_utc": "2026-04-27",
+  "executed_by": "Cursor agent: opencode run -m <id> (subscription/API 依存)",
+  "prompt": "Reply in exactly 5 words: provider smoke test OK",
+  "note": "bench の --model とは無関係。OpenCode CLI の疎通確認用。",
+  "models": [
+    {
+      "model": "opencode-go/glm-5.1",
+      "exit_code": 0,
+      "ok": true,
+      "wall_ms": 2957.1,
+      "stdout_excerpt": "provider smoke test OK",
+      "stderr_excerpt": "\u001b[0m\n> build · glm-5.1\n\u001b[0m"
+    },
+    {
+      "model": "opencode-go/deepseek-v4-flash",
+      "exit_code": 0,
+      "ok": true,
+      "wall_ms": 3258.2,
+      "stdout_excerpt": "provider smoke test OK",
+      "stderr_excerpt": "\u001b[0m\n> build · deepseek-v4-flash\n\u001b[0m"
+    },
+    {
+      "model": "opencode-go/kimi-k2.5",
+      "exit_code": 0,
+      "ok": true,
+      "wall_ms": 6056.3,
+      "stdout_excerpt": "The provider smoke test OK",
+      "stderr_excerpt": "\u001b[0m\n> build · kimi-k2.5\n\u001b[0m"
+    }
+  ]
+}

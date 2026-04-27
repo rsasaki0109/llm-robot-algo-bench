@@ -17,10 +17,17 @@
 | 内容 | 値 |
 |------|-----|
 | 実行コード | 未登録のため **baseline と同一**（指標は同梱自己整合。将来差し替え可） |
-| 生ログ（JSON まとめ） | [docs/benchmarks/opus-4.7.json](docs/benchmarks/opus-4.7.json) |
+| 生ログ（JSON まとめ） | [docs/benchmarks/opus-4.7.json](docs/benchmarks/opus-4.7.json)（`executed_by` 付き再計測） |
 | 計測日 | 2026-04-27 (UTC) |
 
-`runtime_ms` 例: gnss 0.26, lidar 2.42, vision 14.4, planning 0.33, control 0.12（**環境で変動**）。**algo の差**は出ない（baseline 同一実装のため）が、**`--model` 名付きの検証**として同じ手順を踏める。
+`runtime_ms` は**毎回変動**。**algo の差**は出ない（baseline 同一実装のため）が、**`--model` 名付きの検証**として同じ手順を踏める。
+
+### OpenCode プロバイダ疎通（`opencode run`、bench 指標ではない）
+
+| 内容 | 値 |
+|------|-----|
+| 意味 | `opencode-go/glm-5.1` 等に **1 行プロンプト**を投げ、HTTP/API が通るかの確認（**ロボ用メトリクスは含まない**） |
+| ログ | [docs/benchmarks/opencode_provider_smoke.json](docs/benchmarks/opencode_provider_smoke.json)（GLM / DeepSeek Flash / Kimi 例） |
 
 ---
 

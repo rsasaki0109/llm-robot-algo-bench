@@ -72,6 +72,14 @@ cd /path/to/llm-robot-algo-bench
 4. `bench run --task gnss --input data/gnss/sample.nmea --model opencode-gnss-20260427`  
 5. [README](README.md) の表に行を足す。
 
+## 疎通ログ（リポ同梱）
+
+`opencode run -m` で **GLM / DeepSeek / Kimi**（`opencode-go/...`）を試したスナップショット例:
+
+- [docs/benchmarks/opencode_provider_smoke.json](benchmarks/opencode_provider_smoke.json)（**bench 指標ではない**／CLI の応答確認のみ）
+
+`bench` の数値比較は、生成コードを `model_registry` に入れたあと、通常どおり `bench run --model <名前>`。
+
 ## 参考
 
 - [docs/CURSOR.md](CURSOR.md)（Cursor 側の Composer / Opus と `--model` スラッグの整理）  
