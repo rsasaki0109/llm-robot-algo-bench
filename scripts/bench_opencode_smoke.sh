@@ -23,10 +23,16 @@ else
   echo "  警告: models --refresh に失敗 (ネットワーク等)。続行します。" >&2
 fi
 
+# opencode run は環境で数分掛かるため timeout（秒）は OPENCODE_RUN_TIMEOUT、既定 120）
+OPENCODE_RUN_TIMEOUT="${OPENCODE_RUN_TIMEOUT:-120}"
+
 if [[ -n "$OPENCODE_MODEL" ]]; then
-  echo "==> opencode: 疎通 ($OPENCODE_MODEL) — subscription/API の範囲で使えるか確認 ==="
-  opencode run -m "$OPENCODE_MODEL" "Reply with exactly one line: SMOKE_OK"
-  echo "OK (opencode run 完了)"
+  echo "==> opencode: 疎通 ($OPENCODE_MODEL) — ${OPENCODE_RUN_TIMEOUT}s 以内（subscription/API 次第）==="
+  if timeout "$OPENCODE_RUN_TIMEOUT" opencode run -m "$OPENCODE_MODEL" "Reply with exactly one line: SMOKE_OK"; then
+    echo "OK (opencode run 完了)"
+  else
+    echo "注意: opencode run が失敗/タイムアウト。bench は続行します。" >&2
+  fi
 else
   echo "OPENCODE_MODEL 未設定: OpenCode 疎通はスキップ。指定例: export OPENCODE_MODEL=anthropic/<id>"
   echo "利用可能ID確認: opencode models"
