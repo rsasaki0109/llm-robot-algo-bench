@@ -15,6 +15,7 @@ from evaluator.lidar import evaluate_lidar
 from evaluator.planning import evaluate_planning
 from evaluator.vision import evaluate_vision
 from runner.executor import run_task
+from utils.bench_bars import runtime_bars_code_block
 
 
 def _repo_root() -> Path:
@@ -218,6 +219,29 @@ def cmd_compare(args: argparse.Namespace) -> int:
             f.write(
                 "| " + " | ".join(str(r.get(k, "")) for k in key_order) + " |\n"
             )
+        bar_rows: list[tuple[str, float]] = []
+        for r in rows:
+            v = r.get("runtime_ms")
+            if v == "" or v is None:
+                continue
+            try:
+                vf = float(v)
+            except (TypeError, ValueError):
+                continue
+            model = str(r.get("model", ""))
+            task = str(r.get("task", ""))
+            fn = str(r.get("file", ""))
+            if model and task:
+                label = f"`{model}` / {task}"
+            elif model:
+                label = f"`{model}`"
+            else:
+                label = f"`{fn}`"
+            bar_rows.append((label, vf))
+        if bar_rows:
+            f.write("\n## `runtime_ms` 横棒（相対）\n\n")
+            f.write("このディレクトリ内の**最長**をフル幅（`█`）に合わせた比較。\n\n")
+            f.write(runtime_bars_code_block(bar_rows))
     csvp = d / "leaderboard.csv"
     with open(csvp, "w", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=key_order, extrasaction="ignore")

@@ -1,6 +1,9 @@
 # ベンチマーク参考（数値の詳細）
 
-**まずは1枚: [docs/benchmarks/SUMMARY.md](docs/benchmarks/SUMMARY.md)**（`runtime` 比較のクイック表。更新は `python3 scripts/gen_benchmark_summary.py`）
+**まずは1枚: [docs/benchmarks/SUMMARY.md](docs/benchmarks/SUMMARY.md)**（`runtime` 比較のクイック表＋横棒）
+
+- **テーブル・横棒・`docs/benchmarks/*.json` を一括更新**（同梱 `data/*` で `bench run`×5×モデル）: `python3 scripts/refresh_benchmark_docs.py`（環境メモ: `BENCH_EXECUTED_BY` / `BENCH_HOST_NOTE` 任意）
+- **JSON は触らず SUMMARY だけ**: `python3 scripts/gen_benchmark_summary.py`
 
 各モデル比較の**長い表**は [README 冒頭付近](README.md) も可。本ファイルは、同梱デモ条件の**詳細**と**再現手順**のメモ用です。
 
@@ -28,7 +31,7 @@
 
 | 内容 | 値 |
 |------|-----|
-| 意味 | `opencode-go/glm-5.1` 等に **1 行プロンプト**を投げ、HTTP/API が通るかの確認（**ロボ用メトリクスは含まない**） |
+| 意味 | `opencode-go/kimi-k2.6` 等に **1 行プロンプト**を投げ、HTTP/API が通るかの確認（**ロボ用メトリクスは含まない**） |
 | ログ | [docs/benchmarks/opencode_provider_smoke.json](docs/benchmarks/opencode_provider_smoke.json)（GLM / DeepSeek Flash / Kimi 例） |
 
 ---

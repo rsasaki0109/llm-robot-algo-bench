@@ -3,7 +3,10 @@
 ![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)
 ![CI smoke](https://github.com/rsasaki0109/llm-robot-algo-bench/actions/workflows/smoke.yml/badge.svg)
 
-**👉 ベンチ結果をさっと見る → [docs/benchmarks/SUMMARY.md](docs/benchmarks/SUMMARY.md)**（`runtime_ms` 一行表・JSON へリンク。再生成: `python3 scripts/gen_benchmark_summary.py`）
+**👉 ベンチ結果をさっと見る → [docs/benchmarks/SUMMARY.md](docs/benchmarks/SUMMARY.md)**（`runtime_ms` 一行表・横棒・JSON へリンク）
+
+- **JSON＋SUMMARY を同梱データで作り直す（推奨）**: `python3 scripts/refresh_benchmark_docs.py` → `docs/benchmarks/<model>.json` を上書きし、続けて `gen_benchmark_summary.py` で [SUMMARY.md](docs/benchmarks/SUMMARY.md) を更新。
+- **SUMMARY だけ**既存 JSON から再生成: `python3 scripts/gen_benchmark_summary.py`。
 
 **何ができる？** ロボ向け **5 タスク**（**GNSS / LiDAR / 画像 / 計画 `planning` / 制御 `control`）のパイプラインに対し、**同じ入力**で **生成アルゴ or baseline** を走らせ、**数値＋JSON** で比較する。**GPU 不要・ローカル CLI**（`bench run`）。
 
@@ -47,7 +50,7 @@ bench run --task planning  --input data/planning/scenario.json  --model <名前>
 bench run --task control   --input data/control/scenario.json   --model <名前>
 ```
 
-出力 `results/*.json` の `metrics` を上表に**1行**まとめて貼る（PR・コミットでOK）。`bench compare --dir results` で一覧化も可。
+手作業で `results/*.json` の `metrics` を上表に貼る運用も可。一括なら **上記 `refresh_benchmark_docs.py`**。比較表は `bench compare --dir results`（`leaderboard.md` に `runtime_ms` 横棒付き）。
 
 補足: 同梱デモの数値解釈・再現コマンドの詳細は **[BENCHMARKS.md](BENCHMARKS.md)**。`--model` ごとの**生 JSON 指標**: [composer-2-fast](docs/benchmarks/composer-2-fast.json) / [opus-4.7](docs/benchmarks/opus-4.7.json)（**いずれも現状 baseline フォールバック**）。
 
@@ -85,7 +88,7 @@ bench run --task control   --input data/control/scenario.json   --model <名前>
 
 **Cursor での書き方**: エディタ内で **Composer（2 Fast）** や **Opus 4.7** を選んで生成したコードを、上の `composer-2-fast` / `opus-4.7` に紐づけて登録する（**[docs/CURSOR.md](docs/CURSOR.md)**）。定数だけ使う場合は `utils/cursor_models.py` の `COMPOSER_2_FAST` / `OPUS_4_7`。
 
-**OpenCode CLI**（端末）で **`opencode models`** / **`opencode run -m provider/model`** を使う場合は **[docs/OPENCODE.md](docs/OPENCODE.md)**。サブスクリプション内の最新IDは `opencode models --refresh` で確認 → 一括 `bench` は **`scripts/bench_opencode_smoke.sh`**。**GLM / DeepSeek / Kimi** の疎通ログ例: [docs/benchmarks/opencode_provider_smoke.json](docs/benchmarks/opencode_provider_smoke.json)（`bench` の得点ではない）。
+**OpenCode CLI**（端末）で **`opencode models`** / **`opencode run -m provider/model`** を使う場合は **[docs/OPENCODE.md](docs/OPENCODE.md)**。サブスクリプション内の最新IDは `opencode models --refresh` で確認 → 一括 `bench` は **`scripts/bench_opencode_smoke.sh`**。**Kimi 2.6 / Qwen 3.6+ / DeepSeek v4 Pro** 等の疎通ログ例: [docs/benchmarks/opencode_provider_smoke.json](docs/benchmarks/opencode_provider_smoke.json)（`bench` の得点ではない）。
 
 ## タスク一覧（MVP＝5 本）
 

@@ -23,23 +23,24 @@ else
   echo "  警告: models --refresh に失敗 (ネットワーク等)。続行します。" >&2
 fi
 
-# opencode run の待ち上限（秒）。**必ず正の上限**（無制限モードはない）。
-# 未設定: 3600。長くしたい: 7200 等。0 や空は既定 3600 に丸める。
-_op_to="${OPENCODE_RUN_TIMEOUT:-3600}"
+# opencode run の待ち上限（秒）。**必ず正の上限**（無制限なし）。
+# 既定 900（15 分）— 多くの環境で「ちょうどいい」目安。足りなければ 1200〜1800、最大 3600 まで。
+# 0 / 不正値は既定 900。上限は 3600（1 時間）を超えない。
+_op_to="${OPENCODE_RUN_TIMEOUT:-900}"
 if ! [[ "$_op_to" =~ ^[0-9]+$ ]]; then
-  _op_to=3600
+  _op_to=900
 fi
 if [[ "$_op_to" -eq 0 ]]; then
-  echo "注意: OPENCODE_RUN_TIMEOUT=0 は使わず、既定 3600 秒にします（無制限は非推奨）。" >&2
-  _op_to=3600
+  echo "注意: OPENCODE_RUN_TIMEOUT=0 は無効のため既定 900 秒（15 分）にします。" >&2
+  _op_to=900
 fi
 if [[ "$_op_to" -lt 60 ]]; then
   echo "注意: 下限 60 秒に丸めます。" >&2
   _op_to=60
 fi
-if [[ "$_op_to" -gt 86400 ]]; then
-  echo "注意: 上限 86400 秒（24h）に丸めます。" >&2
-  _op_to=86400
+if [[ "$_op_to" -gt 3600 ]]; then
+  echo "注意: 上限 3600 秒（1 時間）に丸めます。2 時間は長すぎるため非対応。" >&2
+  _op_to=3600
 fi
 OPENCODE_RUN_TIMEOUT="$_op_to"
 
