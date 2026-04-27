@@ -1,0 +1,39 @@
+name: smoke
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: pip install -e .
+      - name: bench run (sample data)
+        run: |
+          set -e
+          bench run --task gnss --input data/gnss/sample.nmea --model baseline --out /tmp/r_gnss.json
+          bench run --task lidar --input data/lidar/points.npy --model baseline --out /tmp/r_lidar.json
+          bench run --task vision --input data/vision/sample.jpg --model baseline --out /tmp/r_vision.json
+      - name: Assert metrics
+        run: |
+          python - <<'PY'
+          import json
+          for p in ("/tmp/r_gnss.json", "/tmp/r_lidar.json", "/tmp/r_vision.json"):
+              with open(p) as f:
+                  d = json.load(f)
+              assert "metrics" in d, p
+              assert d["metrics"], p
+          print("ok")
+          PY

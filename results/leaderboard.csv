@@ -1,0 +1,5 @@
+file,task,model,runtime_ms,rmse,speed_error,cluster_count_score,mean_iou,n_pred_clusters,n_true_clusters,map50_simple,precision@0.5,recall@0.5,mean_iou_matched
+result_gnss_baseline2_20260426T234123.json,gnss,baseline2,0.194,7.287473522531164e-13,4.107048034995842e-13,,,,,,,,
+result_gnss_gpt-5_20260426T234109.json,gnss,gpt-5,0.21,0.08226945023347824,0.08711026637165184,,,,,,,,
+result_lidar_test_20260426T234112.json,lidar,test,5.898,,,1.0,1.0,3.0,3.0,,,,
+result_vision_test_20260426T234114.json,vision,test,18.386,,,,,,,1.0,1.0,1.0,0.9843730773962929
