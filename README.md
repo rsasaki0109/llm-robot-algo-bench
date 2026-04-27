@@ -83,6 +83,8 @@ bench run --task control   --input data/control/scenario.json   --model <名前>
 
 **Cursor での書き方**: エディタ内で **Composer（2 Fast）** や **Opus 4.7** を選んで生成したコードを、上の `composer-2-fast` / `opus-4.7` に紐づけて登録する（**[docs/CURSOR.md](docs/CURSOR.md)**）。定数だけ使う場合は `utils/cursor_models.py` の `COMPOSER_2_FAST` / `OPUS_4_7`。
 
+**OpenCode CLI**（端末）で **`opencode models`** / **`opencode run -m provider/model`** を使う場合は **[docs/OPENCODE.md](docs/OPENCODE.md)**。サブスクリプション内の最新IDは `opencode models --refresh` で確認 → 一括 `bench` は **`scripts/bench_opencode_smoke.sh`**。
+
 ## タスク一覧（MVP＝5 本）
 
 | タスク | 入力 | 処理（baseline） | 指標（例） |
