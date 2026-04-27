@@ -1,5 +1,5 @@
 {
-  "model": "composer-2-fast",
+  "model": "opencode-go_kimi-k2.6",
   "date_utc": "2026-04-27",
   "executed_by": "scripts/refresh_benchmark_docs.py @ sasaki-desktop",
   "host_note": "model_registry 未登録の model は baseline 実装（指標は同梱デモ自己整合）",
@@ -7,12 +7,12 @@
   "tasks": {
     "gnss": {
       "input": "data/gnss/sample.nmea",
-      "runtime_ms": 0.847,
+      "runtime_ms": 0.402,
       "metrics": {
-        "rmse": 0.25900735568134886,
-        "speed_error": 0.33482494342752334
+        "rmse": 7.287473522531164e-13,
+        "speed_error": 4.107048034995842e-13
       },
-      "quality_pass": false,
+      "quality_pass": true,
       "task_spec": {
         "family": "sensors/geometry",
         "difficulty_tier": 1,
@@ -20,22 +20,22 @@
         "task": "gnss"
       },
       "impl": {
-        "source_file": "tasks/gnss/baseline.py",
+        "source_file": "runner/model_registry.py",
         "code_metrics": {
-          "file": "tasks/gnss/baseline.py",
-          "loc": 138,
+          "file": "runner/model_registry.py",
+          "loc": 122,
           "parse_ok": true,
-          "n_functions": 5,
+          "n_functions": 8,
           "n_async_functions": 0,
-          "approx_decision_nodes": 11
+          "approx_decision_nodes": 19
         },
-        "registry_hit": false,
-        "used_fallback": true
+        "registry_hit": true,
+        "used_fallback": false
       }
     },
     "lidar": {
       "input": "data/lidar/points.npy",
-      "runtime_ms": 2.215,
+      "runtime_ms": 17.537,
       "metrics": {
         "cluster_count_score": 1.0,
         "mean_iou": 1.0,
@@ -50,22 +50,22 @@
         "task": "lidar"
       },
       "impl": {
-        "source_file": "tasks/lidar/baseline.py",
+        "source_file": "runner/model_registry.py",
         "code_metrics": {
-          "file": "tasks/lidar/baseline.py",
-          "loc": 27,
+          "file": "runner/model_registry.py",
+          "loc": 122,
           "parse_ok": true,
-          "n_functions": 1,
+          "n_functions": 8,
           "n_async_functions": 0,
-          "approx_decision_nodes": 1
+          "approx_decision_nodes": 19
         },
-        "registry_hit": false,
-        "used_fallback": true
+        "registry_hit": true,
+        "used_fallback": false
       }
     },
     "vision": {
       "input": "data/vision/sample.jpg",
-      "runtime_ms": 571.896,
+      "runtime_ms": 391.499,
       "metrics": {
         "map50_simple": 1.0,
         "precision@0.5": 1.0,
@@ -80,27 +80,27 @@
         "task": "vision"
       },
       "impl": {
-        "source_file": "tasks/vision/baseline.py",
+        "source_file": "runner/model_registry.py",
         "code_metrics": {
-          "file": "tasks/vision/baseline.py",
-          "loc": 398,
+          "file": "runner/model_registry.py",
+          "loc": 122,
           "parse_ok": true,
-          "n_functions": 14,
+          "n_functions": 8,
           "n_async_functions": 0,
-          "approx_decision_nodes": 42
+          "approx_decision_nodes": 19
         },
-        "registry_hit": false,
-        "used_fallback": true
+        "registry_hit": true,
+        "used_fallback": false
       }
     },
     "planning": {
       "input": "data/planning/scenario.json",
-      "runtime_ms": 0.304,
+      "runtime_ms": 0.614,
       "metrics": {
         "reaches_goal": 1.0,
-        "length_excess": 0.0,
+        "length_excess": -4.0,
         "collision_free": 1.0,
-        "waypoint_mae": 0.0
+        "waypoint_mae": 1.0909090909090908
       },
       "quality_pass": true,
       "task_spec": {
@@ -110,26 +110,26 @@
         "task": "planning"
       },
       "impl": {
-        "source_file": "tasks/planning/baseline.py",
+        "source_file": "runner/model_registry.py",
         "code_metrics": {
-          "file": "tasks/planning/baseline.py",
-          "loc": 77,
+          "file": "runner/model_registry.py",
+          "loc": 122,
           "parse_ok": true,
-          "n_functions": 3,
+          "n_functions": 8,
           "n_async_functions": 0,
-          "approx_decision_nodes": 17
+          "approx_decision_nodes": 19
         },
-        "registry_hit": false,
-        "used_fallback": true
+        "registry_hit": true,
+        "used_fallback": false
       }
     },
     "control": {
       "input": "data/control/scenario.json",
-      "runtime_ms": 0.138,
+      "runtime_ms": 0.355,
       "metrics": {
-        "rmse": 0.0,
-        "max_abs": 0.0,
-        "mean_abs": 0.0
+        "rmse": 0.10435720017291239,
+        "max_abs": 0.12499542980194989,
+        "mean_abs": 0.09559309742568847
       },
       "quality_pass": true,
       "task_spec": {
@@ -139,17 +139,17 @@
         "task": "control"
       },
       "impl": {
-        "source_file": "tasks/control/baseline.py",
+        "source_file": "runner/model_registry.py",
         "code_metrics": {
-          "file": "tasks/control/baseline.py",
-          "loc": 32,
+          "file": "runner/model_registry.py",
+          "loc": 122,
           "parse_ok": true,
-          "n_functions": 1,
+          "n_functions": 8,
           "n_async_functions": 0,
-          "approx_decision_nodes": 2
+          "approx_decision_nodes": 19
         },
-        "registry_hit": false,
-        "used_fallback": true
+        "registry_hit": true,
+        "used_fallback": false
       }
     }
   }

@@ -1,5 +1,5 @@
 {
-  "model": "composer-2-fast",
+  "model": "opencode-go_deepseek-v4-pro",
   "date_utc": "2026-04-27",
   "executed_by": "scripts/refresh_benchmark_docs.py @ sasaki-desktop",
   "host_note": "model_registry 未登録の model は baseline 実装（指標は同梱デモ自己整合）",
@@ -7,7 +7,7 @@
   "tasks": {
     "gnss": {
       "input": "data/gnss/sample.nmea",
-      "runtime_ms": 0.847,
+      "runtime_ms": 0.8,
       "metrics": {
         "rmse": 0.25900735568134886,
         "speed_error": 0.33482494342752334
@@ -35,7 +35,7 @@
     },
     "lidar": {
       "input": "data/lidar/points.npy",
-      "runtime_ms": 2.215,
+      "runtime_ms": 2.0,
       "metrics": {
         "cluster_count_score": 1.0,
         "mean_iou": 1.0,
@@ -65,7 +65,7 @@
     },
     "vision": {
       "input": "data/vision/sample.jpg",
-      "runtime_ms": 571.896,
+      "runtime_ms": 551.963,
       "metrics": {
         "map50_simple": 1.0,
         "precision@0.5": 1.0,
@@ -95,7 +95,7 @@
     },
     "planning": {
       "input": "data/planning/scenario.json",
-      "runtime_ms": 0.304,
+      "runtime_ms": 0.183,
       "metrics": {
         "reaches_goal": 1.0,
         "length_excess": 0.0,
@@ -125,7 +125,7 @@
     },
     "control": {
       "input": "data/control/scenario.json",
-      "runtime_ms": 0.138,
+      "runtime_ms": 0.084,
       "metrics": {
         "rmse": 0.0,
         "max_abs": 0.0,

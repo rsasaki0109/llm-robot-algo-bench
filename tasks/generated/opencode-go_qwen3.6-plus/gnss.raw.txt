@@ -1,0 +1,171 @@
+```python
+from __future__ import annotations
+
+import math
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
+import numpy as np
+
+from tasks.gnss.nmea import GgaFix, iter_gga_fixes
+
+_A_WGS84 = 6378137.0
+_E2_WGS84 = 6.69437999014e-3
+
+
+def _lla_to_ecef(lat_deg: float, lon_deg: float, h_m: float) -> Tuple[float, float, float]:
+    lat = math.radians(lat_deg)
+    lon = math.radians(lon_deg)
+    sin_lat = math.sin(lat)
+    cos_lat = math.cos(lat)
+    sin_lon = math.sin(lon)
+    cos_lon = math.cos(lon)
+    N = _A_WGS84 / math.sqrt(1.0 - _E2_WGS84 * sin_lat * sin_lat)
+    x = (N + h_m) * cos_lat * cos_lon
+    y = (N + h_m) * cos_lat * sin_lon
+    z = (N * (1.0 - _E2_WGS84) + h_m) * sin_lat
+    return x, y, z
+
+
+def _ecef_to_enu(
+    x: float, y: float, z: float,
+    lat0_deg: float, lon0_deg: float, h0_m: float,
+) -> Tuple[float, float, float]:
+    x0, y0, z0 = _lla_to_ecef(lat0_deg, lon0_deg, h0_m)
+    dx = x - x0
+    dy = y - y0
+    dz = z - z0
+    lat0 = math.radians(lat0_deg)
+    lon0 = math.radians(lon0_deg)
+    sin_lat0 = math.sin(lat0)
+    cos_lat0 = math.cos(lat0)
+    sin_lon0 = math.sin(lon0)
+    cos_lon0 = math.cos(lon0)
+    e = -sin_lon0 * dx + cos_lon0 * dy
+    n = -sin_lat0 * cos_lon0 * dx - sin_lat0 * sin_lon0 * dy + cos_lat0 * dz
+    u = cos_lat0 * cos_lon0 * dx + cos_lat0 * sin_lon0 * dy + sin_lat0 * dz
+    return e, n, u
+
+
+def _apply_noise(points: List[Dict[str, float]], sigma: float, seed: int = 42) -> None:
+    if sigma <= 0.0 or not points:
+        return
+    rng = np.random.default_rng(seed)
+    for pt in points:
+        pt["e_m"] += float(rng.normal(0.0, sigma))
+        pt["n_m"] += float(rng.normal(0.0, sigma))
+        pt["u_m"] += float(rng.normal(0.0, sigma))
+
+
+def _kalman_filter_forward(
+    points: List[Dict[str, float]], q: float, r: float
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, List[np.ndarray]]:
+    n = len(points)
+    state_dim = 6
+    x = np.zeros((n, state_dim))
+    P = np.zeros((n, state_dim, state_dim))
+    x_pred = np.zeros((n, state_dim))
+    P_pred = np.zeros((n, state_dim, state_dim))
+    F_list: List[np.ndarray] = [np.eye(state_dim)] * n
+
+    x[0] = np.array([points[0]["e_m"], points[0]["n_m"], points[0]["u_m"], 0.0, 0.0, 0.0])
+    P[0] = np.eye(state_dim) * 10.0
+    x_pred[0] = x[0].copy()
+    P_pred[0] = P[0].copy()
+
+    H = np.zeros((3, state_dim))
+    H[0, 0] = H[1, 1] = H[2, 2] = 1.0
+    R_mat = np.eye(3) * r
+    q2 = q * q
+    I6 = np.eye(state_dim)
+
+    for k in range(1, n):
+        dt = max(points[k]["t_s"] - points[k - 1]["t_s"], 0.01)
+
+        F = I6.copy()
+        F[0, 3] = F[1, 4] = F[2, 5] = dt
+        F_list[k] = F
+
+        Q = np.zeros((state_dim, state_dim))
+        for i in range(3):
+            Q[i, i] = q2 * dt ** 4 / 4.0
+            Q[i, i + 3] = Q[i + 3, i] = q2 * dt ** 3 / 2.0
+            Q[i + 3, i + 3] = q2 * dt ** 2
+
+        x_pred[k] = F @ x[k - 1]
+        P_pred[k] = F @ P[k - 1] @ F.T + Q
+
+        z = np.array([points[k]["e_m"], points[k]["n_m"], points[k]["u_m"]])
+        y_res = z - H @ x_pred[k]
+        S = H @ P_pred[k] @ H.T + R_mat
+        K = P_pred[k] @ H.T @ np.linalg.inv(S)
+
+        x[k] = x_pred[k] + K @ y_res
+        P[k] = (I6 - K @ H) @ P_pred[k]
+
+    return x, P, x_pred, P_pred, F_list
+
+
+def _rts_backward_smooth(
+    x: np.ndarray, P: np.ndarray, x_pred: np.ndarray, P_pred: np.ndarray,
+    F_list: List[np.ndarray]
+) -> np.ndarray:
+    n = x.shape[0]
+    x_smooth = x.copy()
+    for k in range(n - 2, -1, -1):
+        G = P[k] @ F_list[k + 1].T @ np.linalg.inv(P_pred[k + 1])
+        x_smooth[k] = x[k] + G @ (x_smooth[k + 1] - x_pred[k + 1])
+    return x_smooth
+
+
+def _build_output(x_smooth: np.ndarray, points: List[Dict[str, float]]) -> Tuple[List[Dict[str, float]], List[float]]:
+    n = x_smooth.shape[0]
+    traj: List[Dict[str, float]] = []
+    speeds: List[float] = []
+    for k in range(n):
+        traj.append({
+            "t_s": points[k]["t_s"],
+            "e_m": float(x_smooth[k, 0]),
+            "n_m": float(x_smooth[k, 1]),
+            "u_m": float(x_smooth[k, 2]),
+        })
+        speeds.append(float(math.sqrt(
+            x_smooth[k, 3] ** 2 + x_smooth[k, 4] ** 2 + x_smooth[k, 5] ** 2
+        )))
+    return traj, speeds
+
+
+def run_gnss(
+    input_path: Path,
+    model: str = "baseline",
+    noise_m: float = 0.0,
+) -> Dict[str, Any]:
+    text = input_path.read_text(encoding="utf-8", errors="replace")
+    fixes: List[GgaFix] = list(iter_gga_fixes(text))
+
+    if not fixes:
+        return {"enu_trajectory": [], "speed_m_s": []}
+
+    ref = fixes[0]
+    ref_ecef = _lla_to_ecef(ref.lat_deg, ref.lon_deg, ref.height_m)
+
+    enu_points: List[Dict[str, float]] = []
+    for f in fixes:
+        ecef = _lla_to_ecef(f.lat_deg, f.lon_deg, f.height_m)
+        e, n, u = _ecef_to_enu(*ecef, ref.lat_deg, ref.lon_deg, ref.height_m)
+        enu_points.append({"t_s": f.t_s, "e_m": e, "n_m": n, "u_m": u})
+
+    _apply_noise(enu_points, noise_m)
+
+    if len(enu_points) == 1:
+        return {
+            "enu_trajectory": [dict(enu_points[0])],
+            "speed_m_s": [0.0],
+        }
+
+    x, P, x_pred, P_pred, F_list = _kalman_filter_forward(enu_points, q=0.5, r=1.0)
+    x_smooth = _rts_backward_smooth(x, P, x_pred, P_pred, F_list)
+    traj, speeds = _build_output(x_smooth, enu_points)
+
+    return {"enu_trajectory": traj, "speed_m_s": speeds}
+```
