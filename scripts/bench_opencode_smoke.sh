@@ -23,25 +23,32 @@ else
   echo "  警告: models --refresh に失敗 (ネットワーク等)。続行します。" >&2
 fi
 
-# opencode run の待ち上限（秒）。OPENCODE_RUN_TIMEOUT=0 で **無制限**（遅いが最後まで待つ）
-# 未設定時は 3600（1 時間）。短くしたいときだけ 600 等を指定。
-OPENCODE_RUN_TIMEOUT="${OPENCODE_RUN_TIMEOUT:-3600}"
+# opencode run の待ち上限（秒）。**必ず正の上限**（無制限モードはない）。
+# 未設定: 3600。長くしたい: 7200 等。0 や空は既定 3600 に丸める。
+_op_to="${OPENCODE_RUN_TIMEOUT:-3600}"
+if ! [[ "$_op_to" =~ ^[0-9]+$ ]]; then
+  _op_to=3600
+fi
+if [[ "$_op_to" -eq 0 ]]; then
+  echo "注意: OPENCODE_RUN_TIMEOUT=0 は使わず、既定 3600 秒にします（無制限は非推奨）。" >&2
+  _op_to=3600
+fi
+if [[ "$_op_to" -lt 60 ]]; then
+  echo "注意: 下限 60 秒に丸めます。" >&2
+  _op_to=60
+fi
+if [[ "$_op_to" -gt 86400 ]]; then
+  echo "注意: 上限 86400 秒（24h）に丸めます。" >&2
+  _op_to=86400
+fi
+OPENCODE_RUN_TIMEOUT="$_op_to"
 
 if [[ -n "$OPENCODE_MODEL" ]]; then
-  if [[ "${OPENCODE_RUN_TIMEOUT}" == "0" ]]; then
-    echo "==> opencode: 疎通 ($OPENCODE_MODEL) — **タイムアウトなし**（完了まで待つ）==="
-    if opencode run -m "$OPENCODE_MODEL" "Reply with exactly one line: SMOKE_OK"; then
-      echo "OK (opencode run 完了)"
-    else
-      echo "注意: opencode run が失敗。bench は続行します。" >&2
-    fi
+  echo "==> opencode: 疎通 ($OPENCODE_MODEL) — 最大 ${OPENCODE_RUN_TIMEOUT}s ==="
+  if timeout "$OPENCODE_RUN_TIMEOUT" opencode run -m "$OPENCODE_MODEL" "Reply with exactly one line: SMOKE_OK"; then
+    echo "OK (opencode run 完了)"
   else
-    echo "==> opencode: 疎通 ($OPENCODE_MODEL) — 最大 ${OPENCODE_RUN_TIMEOUT}s（OPENCODE_RUN_TIMEOUT=0 で無制限）==="
-    if timeout "$OPENCODE_RUN_TIMEOUT" opencode run -m "$OPENCODE_MODEL" "Reply with exactly one line: SMOKE_OK"; then
-      echo "OK (opencode run 完了)"
-    else
-      echo "注意: opencode run が失敗/タイムアウト。bench は続行します。" >&2
-    fi
+    echo "注意: opencode run が失敗/タイムアウト。bench は続行します。" >&2
   fi
 else
   echo "OPENCODE_MODEL 未設定: OpenCode 疎通はスキップ。指定例: export OPENCODE_MODEL=anthropic/<id>"
