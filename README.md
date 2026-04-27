@@ -3,7 +3,9 @@
 ![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)
 ![CI smoke](https://github.com/rsasaki0109/llm-robot-algo-bench/actions/workflows/smoke.yml/badge.svg)
 
-**何ができる？** ロボティクス向けの小さな3タスク（**GNSS / LiDAR / 画像**）について、**同じ入力**で **生成アルゴor baseline** を走らせ、**数値＋JSON**で比較する。**GPU不要・ローカルCLI**（`bench run`）。
+**何ができる？** ロボ向け **MVP として 3 本**（**GNSS / LiDAR / 画像**）のパイプラインに対し、**同じ入力**で **生成アルゴ or baseline** を走らせ、**数値＋JSON** で比較する。**GPU 不要・ローカル CLI**（`bench run`）。
+
+**GNSS や点群は「知覚（perception）＋幾何」寄り**に映りやすいが、**この基盤の意図は知覚だけに閉じない**。ロボの肝である **制御（control）**・**動作計画（planning / motion）** も、**同じ `tasks/` + `evaluator/` + `bench run --task` の枠**で拡張する想定（下記「拡張ロードマップ」）。
 
 ---
 
@@ -108,11 +110,20 @@ bench compare --dir <results_dir>
 
 `predictions` 等は追試用に同梱。
 
-## 拡張
+## 拡張ロードマップ（知覚に閉じない）
 
-- **SLAM / 融合**など: 独立 `tasks/*` ＋ evaluator を足す
-- **LLM コード差し替え**: `model_registry` か、一時生成＋`importlib`
-- **CI**: `.github/workflows/smoke.yml` で同梱サンプルに `bench run`
+| 層 | 例（候補） | 本リポでの足し方（方針） |
+|----|------------|--------------------------|
+| **計画 (planning)** | グリッド/グラフ上の経路、障害物回避、時刻制約 | `tasks/planning/`, 参照軌跡＋`evaluator/planning.py`、入力は JSON/点列など固定形式 |
+| **制御 (control)** | 追従、PID/フィードバック、簡易 MPC、トルク/速度の整合 | `tasks/control/`, 参照信号＋`evaluator/control.py`（例: 追従誤差、違反率） |
+| **知覚・センサ** | 現行の `gnss` / `lidar` / `vision`、今後 **SLAM / 融合** も同様 | 独立 `tasks/*` ＋対応 evaluator |
+| **横断** | `model_registry`、CI に `--task` を足す、README の表に行を追加 | 差し替え比較の作法は同じ |
+
+**制御と計画は知覚と同格で重要**（むしろ実機では重みが大きい）。MVP では扱いやすいセンサ系から入っているだけで、**目的は「LLM にロボのどの層のコードを書かせるか」を同じ枠で測ること**。
+
+その他: **LLM コード差し替え**は `model_registry` か一時生成＋`importlib`。**CI**は `.github/workflows/smoke.yml`（タスクが増えたらジョブに `--task` 追加）。
+
+---
 
 ## 同梱サンプル
 
