@@ -5,6 +5,7 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 .mypy_cache/
-results/*.json
-results/figs/
+# 計算結果（ローカル・CI 生成物）
+results/**
 !results/.gitkeep
+results/figs/
