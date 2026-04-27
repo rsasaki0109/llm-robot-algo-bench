@@ -22,6 +22,9 @@ BDIR = ROOT / "docs" / "benchmarks"
 # 表示順: bench
 BENCH_PREFERRED = (
     "baseline",
+    "opencode-go_kimi-k2.6",
+    "opencode-go_qwen3.6-plus",
+    "opencode-go_deepseek-v4-pro",
     "composer-2-fast",
     "opus-4.7",
 )

@@ -35,7 +35,13 @@ TASKS: list[tuple[str, str]] = [
     ("control", "data/control/scenario.json"),
 ]
 
-DEFAULT_MODELS = ("baseline", "composer-2-fast", "opus-4.7")
+# 既定は「実装が実際に動く」モデルを優先（Impl が 0/5 になる行は主要扱いしない）
+DEFAULT_MODELS = (
+    "baseline",
+    "opencode-go_kimi-k2.6",
+    "opencode-go_qwen3.6-plus",
+    "opencode-go_deepseek-v4-pro",
+)
 
 
 def _rel_to_repo(root: Path, abs_p: str) -> str:

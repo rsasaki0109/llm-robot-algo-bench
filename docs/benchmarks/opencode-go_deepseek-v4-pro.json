@@ -7,12 +7,12 @@
   "tasks": {
     "gnss": {
       "input": "data/gnss/sample.nmea",
-      "runtime_ms": 0.8,
+      "runtime_ms": 0.133,
       "metrics": {
-        "rmse": 0.25900735568134886,
-        "speed_error": 0.33482494342752334
+        "rmse": 7.287473522531164e-13,
+        "speed_error": 4.107048034995842e-13
       },
-      "quality_pass": false,
+      "quality_pass": true,
       "task_spec": {
         "family": "sensors/geometry",
         "difficulty_tier": 1,
@@ -23,11 +23,11 @@
         "source_file": "tasks/gnss/baseline.py",
         "code_metrics": {
           "file": "tasks/gnss/baseline.py",
-          "loc": 138,
+          "loc": 89,
           "parse_ok": true,
-          "n_functions": 5,
+          "n_functions": 4,
           "n_async_functions": 0,
-          "approx_decision_nodes": 11
+          "approx_decision_nodes": 8
         },
         "registry_hit": false,
         "used_fallback": true
@@ -35,7 +35,7 @@
     },
     "lidar": {
       "input": "data/lidar/points.npy",
-      "runtime_ms": 2.0,
+      "runtime_ms": 1.505,
       "metrics": {
         "cluster_count_score": 1.0,
         "mean_iou": 1.0,
@@ -65,7 +65,7 @@
     },
     "vision": {
       "input": "data/vision/sample.jpg",
-      "runtime_ms": 551.963,
+      "runtime_ms": 1.159,
       "metrics": {
         "map50_simple": 1.0,
         "precision@0.5": 1.0,
@@ -83,11 +83,11 @@
         "source_file": "tasks/vision/baseline.py",
         "code_metrics": {
           "file": "tasks/vision/baseline.py",
-          "loc": 398,
+          "loc": 67,
           "parse_ok": true,
-          "n_functions": 14,
+          "n_functions": 2,
           "n_async_functions": 0,
-          "approx_decision_nodes": 42
+          "approx_decision_nodes": 7
         },
         "registry_hit": false,
         "used_fallback": true
@@ -95,7 +95,7 @@
     },
     "planning": {
       "input": "data/planning/scenario.json",
-      "runtime_ms": 0.183,
+      "runtime_ms": 0.194,
       "metrics": {
         "reaches_goal": 1.0,
         "length_excess": 0.0,
@@ -113,11 +113,11 @@
         "source_file": "tasks/planning/baseline.py",
         "code_metrics": {
           "file": "tasks/planning/baseline.py",
-          "loc": 77,
+          "loc": 79,
           "parse_ok": true,
-          "n_functions": 3,
+          "n_functions": 4,
           "n_async_functions": 0,
-          "approx_decision_nodes": 17
+          "approx_decision_nodes": 14
         },
         "registry_hit": false,
         "used_fallback": true
@@ -125,7 +125,7 @@
     },
     "control": {
       "input": "data/control/scenario.json",
-      "runtime_ms": 0.084,
+      "runtime_ms": 0.086,
       "metrics": {
         "rmse": 0.0,
         "max_abs": 0.0,
