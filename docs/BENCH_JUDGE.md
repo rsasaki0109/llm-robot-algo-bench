@@ -1,5 +1,7 @@
 # 採点の考え方（AtCoder 風の対応）
 
+開発計画・ロードマップ全体は **[PLAN.md](PLAN.md)**（単一のまとめ）。ここでは **用語対応と設計の話**に絞る。
+
 **「ちゃんと実装できたか」**を一番きれいに出すのは、**AtCoder っぽく「テストで判定」**に寄せることです。本リポの用語をそのイメージに対応させると次のとおり。
 
 | AtCoder 的な概念 | いまのリポでの位置づけ | 備考 |
@@ -26,6 +28,7 @@
 
 ## 関連
 
+- ロードマップ（単一メモ）: [PLAN.md](PLAN.md)  
 - ベンチの目次・優先順位: [docs/benchmarks/SUMMARY.md](benchmarks/SUMMARY.md)  
 - 同梱デモ用閾値: [utils/quality_gates.py](../utils/quality_gates.py)  
 - 指標定義: [evaluator/](../evaluator/)  

@@ -77,6 +77,7 @@ python3 scripts/refresh_benchmark_docs.py
 
 | Doc | Purpose |
 |-----|---------|
+| [docs/PLAN.md](docs/PLAN.md) | **Roadmap / priorities** (single source for “what’s next”) |
 | [docs/benchmarks/SUMMARY.md](docs/benchmarks/SUMMARY.md) | Main results & runtime bars |
 | [BENCHMARKS.md](BENCHMARKS.md) | How to reproduce and read metrics |
 | [docs/BENCH_JUDGE.md](docs/BENCH_JUDGE.md) | AtCoder-style mapping (samples / judge / future multi-case) |

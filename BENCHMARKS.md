@@ -4,7 +4,7 @@
 
 各タスクの出題上の難易度階層（tier）は `result.json` およびスナップショット JSON の `task_spec` を参照。閾値は [utils/quality_gates.py](utils/quality_gates.py)（**同梱デモ用の粗い**合格線。本番データでは要調整）。
 
-**AtCoder 型（サンプル・ジャッジ・隠しテスト）**の対応と、多ケース採用の進め方は [docs/BENCH_JUDGE.md](docs/BENCH_JUDGE.md)。
+**AtCoder 型（サンプル・ジャッジ・隠しテスト）**の対応と、多ケース採用の進め方は [docs/BENCH_JUDGE.md](docs/BENCH_JUDGE.md)。**開発計画・ロードマップ全体**は [docs/PLAN.md](docs/PLAN.md) に一本化。
 
 - **テーブル・横棒・`docs/benchmarks/*.json` を一括更新**（同梱 `data/*` で `bench run`×5×モデル）: `python3 scripts/refresh_benchmark_docs.py`（環境メモ: `BENCH_EXECUTED_BY` / `BENCH_HOST_NOTE` 任意）
 - **JSON は触らず SUMMARY だけ**: `python3 scripts/gen_benchmark_summary.py`

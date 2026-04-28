@@ -21,6 +21,7 @@ CI runs these on Python **3.10** and **3.12** (see `.github/workflows/smoke.yml`
 
 - **Benchmark harness**: tasks, evaluators, CLI, reproducible bundled `data/`.
 - **Docs**: keep claims aligned with what `bench run` actually measures (see `docs/BENCH_JUDGE.md` for design limits).
+- **Roadmap**: avoid duplicating long-term plans in multiple files — update **`docs/PLAN.md`** instead.
 
 ## Changing benchmark numbers in `docs/benchmarks/`
 
