@@ -1,6 +1,10 @@
 # GitHub リポジトリの「About」設定メモ
 
-GitHub の **Settings はファイルでは置けない**ため、**リポのトップ** → 歯車（⚙）「About」欄に、下をコピペして使ってください。見つけてもらいやすさ（星）に効きます。
+GitHub の **Settings はファイルでは置けない**ため、**リポのトップ** → 歯車（⚙）「About」欄に、下をコピペして使ってください。検索・関連リポ・スターに効きます。
+
+## README のクイック表との同期
+
+ルート [README.md](README.md) に **短いリーダーボード表**がある場合、[docs/benchmarks/SUMMARY.md](docs/benchmarks/SUMMARY.md) と数字がずれないよう、`refresh_benchmark_docs.py` のあと必要なら README のスナップショット行だけ更新してください。**正本は常に SUMMARY / `docs/benchmarks/*.json`** とします。
 
 ## Description（1行・英語向け / 国際閲覧用）
 
